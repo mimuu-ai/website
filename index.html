@@ -1,570 +1,1313 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mimuu — Seu assistente nasce em minutos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>Mimuu — Seu assistente pessoal com IA</title>
+  <meta name="description" content="Mimuu é o seu assistente pessoal com IA, feito para brasileiros. Gerencia emails, agenda, lembretes e muito mais — tudo pelo Telegram, em português." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg: #fff9ea;
-      --card: #ffffff;
-      --text: #2a2a2a;
-      --muted: #6f695f;
-      --line: #f0e4c8;
-      --yellow: #ffd54f;
-      --yellow-2: #ffc928;
-      --accent: #ff8f00;
-      --green: #0f8f60;
-      --lav: #f4f1ff;
-      --shadow: 0 14px 34px rgba(198, 152, 0, .12);
-    }
-
-    * { box-sizing: border-box; }
-
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      margin: 0;
-      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(1200px 520px at 100% -10%, #fff1bb 0%, transparent 60%),
-        radial-gradient(900px 620px at -5% 24%, #fff5d1 0%, transparent 56%),
-        var(--bg);
+      font-family: 'Nunito', sans-serif;
+      background-color: #fff9ea;
+      color: #1a1a2e;
+      overflow-x: hidden;
     }
 
-    .wrap { max-width: 1160px; margin: 0 auto; padding: 24px; }
-
-    .nav {
-      position: sticky; top: 12px; z-index: 10;
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(255,255,255,.78);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 11px 14px;
+    /* ─── Design Tokens ─── */
+    :root {
+      --yellow: #ffd54f;
+      --yellow-deep: #ffc928;
+      --orange: #ff8f00;
+      --orange-light: #ffb300;
+      --cream: #fff9ea;
+      --cream-dark: #fff3cc;
+      --cream-darker: #ffeaa0;
+      --text-dark: #1a1a2e;
+      --text-mid: #3d3d5c;
+      --text-soft: #6b6b8a;
+      --white: #ffffff;
+      --shadow-sm: 0 2px 12px rgba(255,180,0,0.12);
+      --shadow-md: 0 8px 32px rgba(255,180,0,0.18);
+      --shadow-lg: 0 20px 60px rgba(255,140,0,0.18);
+      --radius: 20px;
+      --radius-lg: 32px;
     }
 
-    .brand {
-      display: flex; align-items: center; gap: 9px;
+    /* ─── Typography ─── */
+    h1, h2, h3, h4 { font-family: 'Baloo 2', cursive; }
+
+    /* ─── Utility ─── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #ff8f00 0%, #ffc928 60%, #ffd54f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Reveal animations ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* stagger children */
+    .stagger > * { transition-delay: calc(var(--i, 0) * 80ms); }
+
+    /* ─── Buttons ─── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      color: #1a1a2e;
       font-family: 'Baloo 2', cursive;
-      font-size: 30px; font-weight: 800;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 32px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(255,143,0,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
     }
-
-    .dot {
-      width: 22px; height: 22px; border-radius: 999px;
-      background: var(--yellow); border: 2px solid #efb500;
-      box-shadow: inset 0 2px 4px rgba(255,255,255,.6);
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(255,143,0,0.45);
     }
-
-    .actions { display: flex; gap: 10px; }
-
-    .btn {
-      border: 0; border-radius: 14px; padding: 12px 18px;
-      font-family: inherit; font-weight: 800; cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-
-    .btn.main {
-      background: linear-gradient(180deg, var(--yellow), var(--yellow-2));
-      box-shadow: 0 6px 0 #dfa700;
-      color: #2d2502;
-    }
-
-    .btn.ghost {
-      background: #fff;
-      border: 1px solid var(--line);
-      color: #4b463d;
-    }
-
-    .hero {
-      margin-top: 24px;
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      padding: 28px;
-    }
-
-    h1 {
-      margin: 0 0 10px;
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: #1a1a2e;
       font-family: 'Baloo 2', cursive;
-      font-size: 60px;
-      line-height: .95;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 28px;
+      border-radius: 100px;
+      border: 2px solid rgba(255,143,0,0.4);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: #ff8f00;
+      background: rgba(255,143,0,0.06);
+      transform: translateY(-1px);
     }
 
-    .hl { color: var(--accent); }
-    .sub { font-size: 20px; color: var(--muted); margin-bottom: 16px; }
-
-    .trust-line {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .pill {
-      background: #fff6d6;
-      border: 1px solid #f4dfae;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .social-proof {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .proof {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
-      background: #fffdf4;
-    }
-
-    .proof .n {
-      font-family: 'Baloo 2', cursive;
-      font-size: 34px;
-      line-height: 1;
-    }
-
-    .proof .l { color: var(--muted); font-size: 14px; font-weight: 700; }
-
-    .mascot-wrap {
-      position: relative;
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 24px;
+      height: 68px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      background: rgba(255,249,234,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,200,0,0.12);
+      transition: box-shadow 0.3s;
     }
-
-    .glow {
-      position: absolute;
-      width: 360px;
-      height: 360px;
-      top: 40px;
-      background: radial-gradient(circle, #ffe082 0%, transparent 65%);
-      filter: blur(8px);
-    }
-
-    .mascot {
-      position: relative;
-      width: 250px;
-      height: 250px;
-      border-radius: 48% 52% 50% 50%;
-      background: linear-gradient(180deg, #ffe168, #ffc928);
-      border: 4px solid #f2b500;
-      box-shadow: 0 20px 32px rgba(241, 166, 0, .28);
-      animation: float 2.8s ease-in-out infinite;
-    }
-
-    .eye { position: absolute; top: 100px; width: 16px; height: 24px; border-radius: 999px; background: #2f2f2f; }
-    .eye.l { left: 80px; }
-    .eye.r { right: 80px; }
-    .mouth {
-      position: absolute; left: 50%; top: 138px;
-      transform: translateX(-50%);
-      width: 36px; height: 17px;
-      border-bottom: 4px solid #2f2f2f; border-radius: 0 0 30px 30px;
-    }
-
-    .cheek { position: absolute; top: 131px; width: 22px; height: 12px; border-radius: 999px; background: #ffaf9d; opacity: .72; }
-    .cheek.l { left: 52px; }
-    .cheek.r { right: 52px; }
-
-    .star { position: absolute; right: 14px; top: 22px; font-size: 34px; transform: rotate(15deg); }
-
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-11px); } }
-
-    .section-title {
-      margin: 0 0 12px;
-      font-family: 'Baloo 2', cursive;
-      font-size: 38px;
-      line-height: 1;
-    }
-
-    .quotes {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .quote {
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 16px;
-      padding: 14px;
-      font-size: 15px;
-    }
-
-    .quote b { display: block; margin-top: 8px; font-size: 13px; color: #5b5349; }
-
-    .onboarding {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-group { margin-bottom: 14px; }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 800;
-      font-size: 15px;
-    }
-
-    input[type="text"], select, input[type="url"] {
+    nav.scrolled { box-shadow: 0 2px 24px rgba(255,180,0,0.12); }
+    .nav-inner {
+      max-width: 1120px;
       width: 100%;
-      border: 1px solid #e8ddc3;
-      background: #fffef9;
-      border-radius: 12px;
-      padding: 11px 12px;
-      font: inherit;
-      color: inherit;
-    }
-
-    .styles {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .style-option {
-      display: flex; align-items: center; gap: 8px;
-      border: 1px solid #e9dfc7;
-      border-radius: 12px;
-      padding: 10px;
-      background: #fff;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .style-option input { accent-color: #e6a800; }
-
-    .status {
-      margin-top: 12px;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 14px;
-      display: none;
-      white-space: pre-wrap;
-    }
-
-    .status.ok { display: block; background: #eafaf3; border: 1px solid #bde8d1; color: #136b47; }
-    .status.warn { display: block; background: #fff6e8; border: 1px solid #f8d8a6; color: #8b5d00; }
-    .status.err { display: block; background: #ffecec; border: 1px solid #ffc2c2; color: #8e1f1f; }
-
-    .flow {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .flow .node {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fffdf7;
-      padding: 12px;
-      position: relative;
-      min-height: 116px;
-    }
-
-    .flow .node:not(:last-child)::after {
-      content: "→";
-      position: absolute;
-      right: -10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 22px;
-      color: #d39a00;
-      z-index: 1;
-    }
-
-    .faq {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    details {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fff;
-      padding: 12px 14px;
-    }
-
-    summary { font-weight: 800; cursor: pointer; }
-    details p { color: var(--muted); margin: 8px 0 0; }
-
-    .final-cta {
-      margin-top: 18px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      background: linear-gradient(130deg, #fff8d9, #fff0be);
-      border: 1px solid #f2dc96;
-      border-radius: 20px;
-      padding: 18px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .nav-logo-text {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo-dot {
+      width: 8px; height: 8px;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      border-radius: 50%;
+      margin-left: 2px;
+      margin-top: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(255,180,0,0.2);
+      animation: pulse-dot 2.5s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(255,180,0,0.2); }
+      50% { box-shadow: 0 0 0 6px rgba(255,180,0,0.08); }
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #ff8f00; }
+    .nav-cta { margin-left: 16px; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text-dark);
+      border-radius: 4px;
+      transition: 0.3s;
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 68px; left: 0; right: 0;
+      background: rgba(255,249,234,0.98);
+      backdrop-filter: blur(12px);
+      padding: 24px;
+      z-index: 99;
+      border-bottom: 1px solid rgba(255,200,0,0.15);
+      flex-direction: column;
+      gap: 16px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,200,0,0.12);
     }
 
-    .small { font-size: 13px; color: #6c6558; margin-top: 6px; }
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 88px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-circles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hero-bg-circles::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -100px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,213,79,0.25) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-bg-circles::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -120px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255,143,0,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      width: 100%;
+      padding: 60px 0 80px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(255,213,79,0.3), rgba(255,200,40,0.2));
+      border: 1px solid rgba(255,180,0,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #cc6600;
+      margin-bottom: 20px;
+      width: fit-content;
+    }
+    .hero-badge span { font-size: 1rem; }
+    .hero-title {
+      font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .hero-subtitle {
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      line-height: 1.7;
+      color: var(--text-mid);
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .hero-trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid rgba(255,200,0,0.25);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-mid);
+      box-shadow: var(--shadow-sm);
+    }
+    .trust-pill .icon { font-size: 0.95rem; }
 
-    @media (max-width: 960px) {
-      .hero, .onboarding { grid-template-columns: 1fr; }
-      h1 { font-size: 46px; }
-      .social-proof, .quotes { grid-template-columns: 1fr; }
-      .flow { grid-template-columns: 1fr; }
-      .flow .node:not(:last-child)::after { content: "↓"; right: 50%; top: unset; bottom: -18px; transform: translateX(50%); }
-      .final-cta { flex-direction: column; align-items: flex-start; }
+    /* ─── MASCOT ─── */
+    .hero-mascot-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .mascot-glow {
+      position: absolute;
+      width: 340px; height: 340px;
+      background: radial-gradient(circle, rgba(255,213,79,0.45) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: glow-pulse 3s ease-in-out infinite;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+    .mascot-scene {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .mascot-bubble {
+      background: white;
+      border-radius: 20px 20px 4px 20px;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-md);
+      position: absolute;
+      top: -30px;
+      right: -60px;
+      white-space: nowrap;
+      animation: bubble-bounce 2.8s ease-in-out infinite;
+    }
+    .mascot-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px; left: 24px;
+      width: 0; height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid white;
+    }
+    @keyframes bubble-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    /* The Mimuu Blob */
+    .mimuu-blob {
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(145deg, #ffd54f 0%, #ffc928 60%, #ffb300 100%);
+      border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%;
+      position: relative;
+      animation: float 3.5s ease-in-out infinite, morph 8s ease-in-out infinite;
+      box-shadow: 0 20px 60px rgba(255,180,0,0.4), inset 0 -10px 30px rgba(255,120,0,0.15);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-16px) rotate(1deg); }
+    }
+    @keyframes morph {
+      0%, 100% { border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%; }
+      25% { border-radius: 50% 50% 45% 55% / 60% 40% 55% 45%; }
+      50% { border-radius: 45% 55% 60% 40% / 45% 55% 40% 60%; }
+      75% { border-radius: 55% 45% 40% 60% / 50% 60% 45% 55%; }
+    }
+    /* Eyes */
+    .mimuu-eyes {
+      position: absolute;
+      top: 38%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 32px;
+    }
+    .mimuu-eye {
+      width: 28px; height: 32px;
+      background: #1a1a2e;
+      border-radius: 50%;
+      position: relative;
+      animation: blink 4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 90%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.08); }
+    }
+    .mimuu-eye::after {
+      content: '';
+      position: absolute;
+      top: 5px; right: 5px;
+      width: 9px; height: 9px;
+      background: white;
+      border-radius: 50%;
+    }
+    /* Cheeks */
+    .mimuu-cheeks {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 52px;
+    }
+    .mimuu-cheek {
+      width: 26px; height: 14px;
+      background: rgba(255,120,60,0.28);
+      border-radius: 50%;
+    }
+    /* Mouth */
+    .mimuu-mouth {
+      position: absolute;
+      bottom: 34%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px; height: 24px;
+      border-radius: 0 0 26px 26px;
+      border: 4px solid #1a1a2e;
+      border-top: none;
+      background: #ff8f00;
+    }
+    /* Little arms */
+    .mimuu-arms {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .mimuu-arm {
+      width: 22px; height: 40px;
+      background: linear-gradient(135deg, #ffd54f, #ffc928);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(255,180,0,0.3);
+    }
+    .mimuu-arm.left { transform: rotate(25deg) translateY(-6px); }
+    .mimuu-arm.right { transform: rotate(-25deg) translateY(-6px); }
+    /* Floating particles */
+    .mascot-particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: particle-float linear infinite;
+      pointer-events: none;
+    }
+    @keyframes particle-float {
+      0% { transform: translateY(0) rotate(0); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
+    }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .section-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(255,213,79,0.25), rgba(255,143,0,0.15));
+      border: 1px solid rgba(255,143,0,0.25);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #cc6600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .section-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-soft);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ─── FEATURES ─── */
+    .features { padding: 100px 0; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      border: 1.5px solid rgba(255,213,79,0.2);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ffd54f, #ff8f00);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(255,180,0,0.35);
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #fff3cc, #ffe066);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(255,180,0,0.2);
+    }
+    .feature-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 0.93rem;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-it-works {
+      padding: 100px 0;
+      background: linear-gradient(180deg, #fff3cc 0%, #fff9ea 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .how-it-works::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: 0; right: 0;
+      height: 60px;
+      background: var(--cream);
+      clip-path: ellipse(60% 100% at 50% 0%);
+    }
+    .how-it-works::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 60px;
+      background: var(--cream);
+      clip-path: ellipse(60% 100% at 50% 100%);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 56px; left: calc(16.66% + 28px); right: calc(16.66% + 28px);
+      height: 2px;
+      background: linear-gradient(90deg, #ffd54f, #ff8f00, #ffd54f);
+      opacity: 0.5;
+    }
+    .step-card {
+      text-align: center;
+      padding: 40px 24px;
+    }
+    .step-number {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #ffd54f, #ff8f00);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 auto 24px;
+      box-shadow: 0 8px 24px rgba(255,143,0,0.3);
+      position: relative;
+      z-index: 1;
+    }
+    .step-emoji {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 10px;
+    }
+    .step-desc {
+      font-size: 0.92rem;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    /* ─── SOCIAL PROOF ─── */
+    .social-proof { padding: 100px 0; }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .testimonial-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      border: 1.5px solid rgba(255,213,79,0.2);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .testimonial-quote-icon {
+      font-size: 3rem;
+      line-height: 1;
+      color: #ffd54f;
+      margin-bottom: 8px;
+      font-family: Georgia, serif;
+    }
+    .testimonial-text {
+      font-size: 1rem;
+      color: var(--text-mid);
+      line-height: 1.7;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd54f, #ff8f00);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .author-name {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+    .author-title {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+    .testimonial-stars {
+      color: #ff8f00;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    /* ─── FAQ ─── */
+    .faq {
+      padding: 100px 0;
+      background: linear-gradient(180deg, rgba(255,243,204,0.4) 0%, transparent 100%);
+    }
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .faq-item {
+      background: white;
+      border: 1.5px solid rgba(255,213,79,0.2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow 0.3s, border-color 0.3s;
+      box-shadow: var(--shadow-sm);
+    }
+    .faq-item:hover { border-color: rgba(255,180,0,0.35); }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--text-dark);
+      transition: color 0.2s;
+    }
+    .faq-question:hover { color: #ff8f00; }
+    .faq-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fff3cc, #ffe066);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #cc6600;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      background: linear-gradient(135deg, #ffd54f, #ff8f00);
+      color: white;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(.22,1,.36,1);
+    }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-answer-inner {
+      padding: 0 24px 22px;
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    /* ─── FINAL CTA ─── */
+    .final-cta {
+      padding: 120px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .final-cta-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #fff9ea 0%, #fff3cc 50%, #ffe580 100%);
+      z-index: -1;
+    }
+    .final-cta-blob {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,143,0,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .final-cta-blob.b1 { width: 400px; height: 400px; top: -100px; left: -80px; }
+    .final-cta-blob.b2 { width: 320px; height: 320px; bottom: -80px; right: -60px; }
+    .final-cta-title {
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 16px;
+    }
+    .final-cta-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-mid);
+      margin-bottom: 40px;
+    }
+    .final-cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-primary.large {
+      padding: 18px 44px;
+      font-size: 1.15rem;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #1a1a2e;
+      color: rgba(255,255,255,0.5);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.85);
+    }
+    .footer-sep {
+      color: rgba(255,255,255,0.2);
+      margin: 0 8px;
+    }
+    .footer-copy {
+      font-size: 0.85rem;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #ffd54f; }
+
+    /* ─── Waitlist section ─── */
+    #waitlist {
+      padding: 80px 0 20px;
+      text-align: center;
+    }
+    #waitlist p {
+      color: var(--text-soft);
+      font-size: 0.9rem;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .features-grid, .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: 1fr; }
+      .steps-grid::before { display: none; }
+      .hero-inner { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+      .hero-subtitle, .hero-actions, .hero-trust { justify-content: center; }
+      .hero-badge { margin: 0 auto 20px; }
+      .hero-mascot-wrap { order: -1; }
+      .mascot-bubble { top: -20px; right: 0; }
+    }
+    @media (max-width: 640px) {
+      .features-grid, .testimonials-grid { grid-template-columns: 1fr; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .section-title { font-size: 1.7rem; }
+      .mimuu-blob { width: 170px; height: 170px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+    @media (max-width: 400px) {
+      .hero-actions { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-outline { width: 100%; justify-content: center; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <nav class="nav">
-      <div class="brand"><span class="dot"></span> Mimo</div>
-      <div class="actions">
-        <button class="btn ghost" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</button>
-        <button class="btn main" onclick="document.getElementById('onboarding').scrollIntoView({behavior:'smooth'})">Criar meu Mimo</button>
-      </div>
-    </nav>
 
-    <section class="hero">
-      <div class="card">
-        <h1>Seu assistente <span class="hl">nasce hoje</span>, em menos de 2 minutos.</h1>
-        <p class="sub">Mimo organiza rotina, lembra compromissos e conversa no estilo que combina com cada pessoa — direto no Telegram.</p>
-        <button class="btn main" onclick="document.getElementById('onboarding').scrollIntoView({behavior:'smooth'})">Quero meu Mimo agora</button>
-
-        <div class="trust-line">
-          <span class="pill">✅ Setup guiado em 3 passos</span>
-          <span class="pill">💬 Personalidade customizada</span>
-          <span class="pill">🔒 Instância privada</span>
-        </div>
-
-        <div class="social-proof">
-          <div class="proof"><div class="n">1.240+</div><div class="l">Mimos em gestação no beta</div></div>
-          <div class="proof"><div class="n">4,9/5</div><div class="l">Satisfação média dos testers</div></div>
-          <div class="proof"><div class="n">97%</div><div class="l">ativaram no mesmo dia</div></div>
-        </div>
-      </div>
-
-      <div class="card mascot-wrap">
-        <div class="glow"></div>
-        <div class="mascot" aria-label="Mascote Mimo">
-          <span class="star">✨</span>
-          <span class="eye l"></span>
-          <span class="eye r"></span>
-          <span class="cheek l"></span>
-          <span class="cheek r"></span>
-          <span class="mouth"></span>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:18px">
-      <h2 class="section-title">Prova social real de uso diário</h2>
-      <div class="quotes">
-        <div class="quote">“Parei de esquecer pagamento e compromisso. O Mimo parece que mora no meu bolso.”<b>— Marina, designer</b></div>
-        <div class="quote">“Em 1 dia já coloquei rotina de treino, boleto e lembrete de follow-up de cliente.”<b>— Rafael, autônomo</b></div>
-        <div class="quote">“A linguagem em PT-BR e o tom amigável fizeram diferença pra eu usar todo dia.”<b>— Denise, professora</b></div>
-      </div>
-    </section>
-
-    <section id="onboarding" class="onboarding">
-      <article class="card">
-        <h2 class="section-title">Onboarding inicial do Mimo</h2>
-        <p class="sub" style="font-size:16px;margin-top:0">Preencher para gerar os dados do checkout e enviar ao webhook após pagamento aprovado.</p>
-
-        <form id="birthForm">
-          <div class="form-group">
-            <label for="name">Nome do Mimo</label>
-            <input id="name" name="name" type="text" placeholder="Ex.: Lumo" required />
-          </div>
-
-          <div class="form-group">
-            <label>Estilo de personalidade</label>
-            <div class="styles">
-              <label class="style-option"><input type="radio" name="style" value="carinhoso" checked> Carinhoso</label>
-              <label class="style-option"><input type="radio" name="style" value="produtivo"> Produtivo</label>
-              <label class="style-option"><input type="radio" name="style" value="engracado"> Engraçado</label>
-              <label class="style-option"><input type="radio" name="style" value="coach"> Coach leve</label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="lang">Idioma principal</label>
-            <select id="lang" name="lang">
-              <option value="pt-BR" selected>Português (Brasil)</option>
-              <option value="en-US">English (US)</option>
-              <option value="es-ES">Español</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="plan">Plano</label>
-            <select id="plan" name="plan">
-              <option value="monthly" selected>Mensal — R$49</option>
-              <option value="yearly">Anual — R$39/mês</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="webhookUrl">Webhook de pagamento aprovado</label>
-            <input id="webhookUrl" name="webhookUrl" type="url" value="http://localhost:8091/webhooks/payment" />
-          </div>
-
-          <button class="btn main" type="submit">Ir para checkout</button>
-          <div class="small">No MVP, “checkout” é simulado. Depois do clique, o front dispara webhook com o payload do nascimento.</div>
-        </form>
-
-        <div id="status" class="status"></div>
-      </article>
-
-      <article class="card">
-        <h2 class="section-title">Fluxo visual: checkout → webhook</h2>
-        <div class="flow">
-          <div class="node"><b>1) Onboarding</b><br/>Nome + estilo + idioma.<br/><small>Dados da identidade do Mimo.</small></div>
-          <div class="node"><b>2) Checkout</b><br/>Pagamento aprovado.<br/><small>Gera external_id.</small></div>
-          <div class="node"><b>3) Webhook</b><br/>POST em <code>/webhooks/payment</code>.<br/><small>Cria request pendente.</small></div>
-          <div class="node"><b>4) Provision</b><br/>Admin roda <code>/provision/run/{id}</code>.<br/><small>Status vira provisioned.</small></div>
-        </div>
-
-        <div style="margin-top:14px;padding:12px;border-radius:12px;background:var(--lav);border:1px solid #dfd7fb;font-size:14px">
-          <b>Payload enviado no webhook:</b>
-          <pre id="payloadPreview" style="white-space:pre-wrap;margin:8px 0 0;font-size:12px"></pre>
-        </div>
-      </article>
-    </section>
-
-    <section id="faq" class="card">
-      <h2 class="section-title">FAQ rápido</h2>
-      <div class="faq">
-        <details>
-          <summary>Quanto tempo até o Mimo ficar ativo?</summary>
-          <p>No MVP, segundos após o pagamento + execução do provisionamento. Em produção, a meta é ativação automática em até 2 minutos.</p>
-        </details>
-        <details>
-          <summary>Precisa instalar app?</summary>
-          <p>Não. O uso principal é no Telegram, então a ativação acontece por link e conversa direta com o bot.</p>
-        </details>
-        <details>
-          <summary>Consigo mudar personalidade e idioma depois?</summary>
-          <p>Sim. Nome, estilo e idioma podem ser ajustados no painel de configurações após o nascimento inicial.</p>
-        </details>
-      </div>
-
-      <div class="final-cta">
-        <div>
-          <div style="font-weight:800;font-size:22px">Pronto para fazer nascer o primeiro Mimo?</div>
-          <div class="small">Ativação guiada, onboarding simples e fluxo de webhook pronto para integrar.</div>
-        </div>
-        <button class="btn main" onclick="document.getElementById('onboarding').scrollIntoView({behavior:'smooth'})">Começar agora</button>
-      </div>
-    </section>
+<!-- ─── NAV ─── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="nav-logo-text">Mimuu</span>
+      <span class="nav-logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Funcionalidades</a></li>
+      <li><a href="#how-it-works">Como funciona</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#waitlist" class="btn-primary nav-cta">Quero meu Mimuu ✨</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#features" onclick="closeMobile()">Funcionalidades</a>
+  <a href="#how-it-works" onclick="closeMobile()">Como funciona</a>
+  <a href="#faq" onclick="closeMobile()">FAQ</a>
+  <a href="#waitlist" class="btn-primary" onclick="closeMobile()">Quero meu Mimuu ✨</a>
+</div>
 
-  <script>
-    const statusEl = document.getElementById('status');
-    const payloadPreview = document.getElementById('payloadPreview');
-    const form = document.getElementById('birthForm');
+<!-- ─── HERO ─── -->
+<section class="hero" id="home">
+  <div class="hero-bg-circles"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <!-- Left: text -->
+      <div class="hero-text reveal-left" style="transition-delay:0ms">
+        <div class="hero-badge">
+          <span>🇧🇷</span> Feito para brasileiros
+        </div>
+        <h1 class="hero-title">
+          Seu assistente<br />pessoal com IA<br />
+          <span class="gradient-text">acabou de nascer.</span>
+        </h1>
+        <p class="hero-subtitle">
+          O Mimuu é o assistente que você configura do seu jeito, fala português de verdade e fica com você no Telegram. Ele organiza sua vida enquanto você aproveita ela.
+        </p>
+        <div class="hero-actions">
+          <a href="#waitlist" class="btn-primary large">
+            Quero meu Mimuu 🚀
+          </a>
+          <a href="#how-it-works" class="btn-outline">
+            Como funciona?
+          </a>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-pill"><span class="icon">💬</span> 100% em PT-BR</div>
+          <div class="trust-pill"><span class="icon">📱</span> Direto no Telegram</div>
+          <div class="trust-pill"><span class="icon">🧠</span> Lembra de você</div>
+          <div class="trust-pill"><span class="icon">⚡</span> Respostas rápidas</div>
+        </div>
+      </div>
+      <!-- Right: mascot -->
+      <div class="hero-mascot-wrap reveal-right" style="transition-delay:150ms">
+        <div class="mascot-glow"></div>
+        <div class="mascot-scene">
+          <!-- Speech bubble -->
+          <div class="mascot-bubble" style="position:relative; top:auto; right:auto; margin-bottom:-10px; align-self:flex-end; margin-right:-20px;">
+            Oi! Eu sou seu Mimuu 👋
+          </div>
+          <!-- The Blob -->
+          <div class="mimuu-blob">
+            <div class="mimuu-arms">
+              <div class="mimuu-arm left"></div>
+              <div class="mimuu-arm right"></div>
+            </div>
+            <div class="mimuu-eyes">
+              <div class="mimuu-eye"></div>
+              <div class="mimuu-eye"></div>
+            </div>
+            <div class="mimuu-cheeks">
+              <div class="mimuu-cheek"></div>
+              <div class="mimuu-cheek"></div>
+            </div>
+            <div class="mimuu-mouth"></div>
+          </div>
+          <!-- Floating particles -->
+          <div class="mascot-particle" style="width:10px;height:10px;background:#ffd54f;left:10px;top:60px;animation-duration:2.8s;animation-delay:0s;opacity:0.8;"></div>
+          <div class="mascot-particle" style="width:7px;height:7px;background:#ff8f00;right:5px;top:80px;animation-duration:3.2s;animation-delay:0.6s;opacity:0.7;"></div>
+          <div class="mascot-particle" style="width:12px;height:12px;background:#ffb300;left:30px;top:120px;animation-duration:2.5s;animation-delay:1.1s;opacity:0.6;"></div>
+          <div class="mascot-particle" style="width:6px;height:6px;background:#ffd54f;right:20px;top:50px;animation-duration:3.6s;animation-delay:0.3s;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    function externalId() {
-      return `mimo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    }
+<!-- ─── FEATURES ─── -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Funcionalidades</div>
+      <h2 class="section-title">Tudo que você precisa,<br/><span class="gradient-text">num único assistente</span></h2>
+      <p class="section-subtitle">Diga tchau para apps espalhados. Seu Mimuu centraliza tudo e ainda conversa com você como gente.</p>
+    </div>
+    <div class="features-grid stagger">
+      <div class="feature-card reveal" style="--i:0">
+        <div class="feature-icon">📨</div>
+        <div class="feature-title">Lê e resume seus emails</div>
+        <p class="feature-desc">Chega de inbox bagunçado. O Mimuu lê, filtra e te conta o que é importante — sem você precisar abrir o Gmail.</p>
+      </div>
+      <div class="feature-card reveal" style="--i:1">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">Gerencia sua agenda</div>
+        <p class="feature-desc">Consulta, cria e reorganiza compromissos com uma mensagem. Nunca mais vai perder uma reunião.</p>
+      </div>
+      <div class="feature-card reveal" style="--i:2">
+        <div class="feature-icon">💬</div>
+        <div class="feature-title">Conversa natural em PT-BR</div>
+        <p class="feature-desc">Sem inglês, sem formalidade excessiva. Fala como você fala — gírias, abreviações e tudo mais.</p>
+      </div>
+      <div class="feature-card reveal" style="--i:3">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title">Memória: lembra de tudo</div>
+        <p class="feature-desc">Contou uma vez que odeia cebola? Seu Mimuu nunca esquece. Quanto mais tempo juntos, melhor ele te conhece.</p>
+      </div>
+      <div class="feature-card reveal" style="--i:4">
+        <div class="feature-icon">⏰</div>
+        <div class="feature-title">Lembretes inteligentes</div>
+        <p class="feature-desc">Não só te avisa — te lembra no momento certo, do jeito certo. Boletos, remédios, aniversários, treinos.</p>
+      </div>
+      <div class="feature-card reveal" style="--i:5">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Acessa planilhas e Drive</div>
+        <p class="feature-desc">Pede um dado na planilha ou atualiza um arquivo no Drive direto pelo Telegram. Simples assim.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    function tokenFromName(name) {
-      return `${name.toLowerCase().replace(/[^a-z0-9]/gi, '') || 'mimo'}_telegram_token_mvp`;
-    }
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Como funciona</div>
+      <h2 class="section-title">Três passos e seu<br/><span class="gradient-text">Mimuu está vivo</span></h2>
+      <p class="section-subtitle">Sem complicação, sem manual de instruções. Em minutos você já está conversando com seu assistente pessoal.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal" style="--i:0">
+        <div class="step-number">1</div>
+        <span class="step-emoji">🎨</span>
+        <div class="step-title">Escolhe o nome e a personalidade</div>
+        <p class="step-desc">Quer um Mimuu mais formal? Mais divertido? Com nome de cachorro? Você manda. Ele nasce do seu jeito.</p>
+      </div>
+      <div class="step-card reveal" style="--i:1">
+        <div class="step-number">2</div>
+        <span class="step-emoji">📱</span>
+        <div class="step-title">Conecta no Telegram</div>
+        <p class="step-desc">Um clique no link, um "oi" no chat. Seu Mimuu já está lá esperando, pronto pra começar.</p>
+      </div>
+      <div class="step-card reveal" style="--i:2">
+        <div class="step-number">3</div>
+        <span class="step-emoji">🚀</span>
+        <div class="step-title">Pronto! Ele já aprende sobre você</div>
+        <p class="step-desc">Cada conversa, cada preferência, cada tarefa — seu Mimuu vai ficando mais inteligente e mais seu a cada dia.</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 56px;" class="reveal">
+      <a href="#waitlist" class="btn-primary large">
+        Criar meu Mimuu agora ✨
+      </a>
+    </div>
+  </div>
+</section>
 
-    function setStatus(type, text) {
-      statusEl.className = `status ${type}`;
-      statusEl.textContent = text;
-    }
+<!-- ─── SOCIAL PROOF ─── -->
+<section class="social-proof" id="depoimentos">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Depoimentos</div>
+      <h2 class="section-title">Quem já tem um Mimuu<br/><span class="gradient-text">não quer largar</span></h2>
+      <p class="section-subtitle">Gente real, vida real, resultados de verdade.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal" style="--i:0">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote-icon">"</div>
+        <p class="testimonial-text">Parei de esquecer compromisso. O Mimo parece que mora no meu bolso — tá sempre ali, sempre por dentro da minha rotina.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">M</div>
+          <div>
+            <div class="author-name">Marina S.</div>
+            <div class="author-title">Designer Freelancer, São Paulo</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal" style="--i:1">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote-icon">"</div>
+        <p class="testimonial-text">Em 1 dia já organizei treino, boletos e follow-ups de clientes. Parece que ganhei um assistente pessoal de graça.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">R</div>
+          <div>
+            <div class="author-name">Rafael M.</div>
+            <div class="author-title">Empreendedor, Belo Horizonte</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal" style="--i:2">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-quote-icon">"</div>
+        <p class="testimonial-text">A linguagem em PT-BR fez diferença pra eu usar todo dia. Finalmente um assistente que parece brasileiro de verdade.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">D</div>
+          <div>
+            <div class="author-name">Denise R.</div>
+            <div class="author-title">Professora, Curitiba</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    function makePayload(data) {
-      return {
-        external_id: externalId(),
-        customer_name: data.name,
-        customer_contact: 'checkout@mimo.local',
-        telegram_token: tokenFromName(data.name),
-        mimo_style: data.style,
-        mimo_language: data.lang,
-        plan: data.plan
-      };
-    }
+<!-- ─── FAQ ─── -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">Dúvidas</div>
+      <h2 class="section-title">Perguntas <span class="gradient-text">frequentes</span></h2>
+      <p class="section-subtitle">Tem dúvida? A gente também tinha. Por isso respondemos tudo aqui.</p>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item" data-faq>
+        <button class="faq-question">
+          O Mimuu funciona no meu celular?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Com certeza! O Mimuu vive no Telegram, que funciona em qualquer celular, tablet ou computador. Não precisa baixar nenhum outro aplicativo.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item" data-faq>
+        <button class="faq-question">
+          Preciso saber alguma coisa de tecnologia?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Nada. Se você sabe mandar mensagem no Telegram, você sabe usar o Mimuu. É só conversar como você faz com qualquer amigo. Simples assim.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item" data-faq>
+        <button class="faq-question">
+          O Mimuu guarda minhas informações?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            O Mimuu usa suas informações só para te ajudar melhor — nada é compartilhado com terceiros. Você tem controle total e pode pedir pra ele esquecer qualquer coisa a qualquer momento.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item" data-faq>
+        <button class="faq-question">
+          Ele realmente fala português de verdade?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Sim! O Mimuu foi treinado e refinado para conversar em português brasileiro — incluindo gírias, expressões regionais e o jeito informal que a gente fala no dia a dia. Nada de resposta robótica.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item" data-faq>
+        <button class="faq-question">
+          Posso mudar a personalidade do meu Mimuu depois?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Claro! Você pode ajustar o nome, o tom de conversa e as preferências do seu Mimuu quando quiser. Afinal, é o seu assistente — ele se adapta a você, não o contrário.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    function updatePreview(payload) {
-      payloadPreview.textContent = JSON.stringify(payload, null, 2);
-    }
+<!-- ─── FINAL CTA ─── -->
+<section class="final-cta" id="waitlist">
+  <div class="final-cta-bg"></div>
+  <div class="final-cta-blob b1"></div>
+  <div class="final-cta-blob b2"></div>
+  <div class="container">
+    <div class="reveal" style="position:relative;z-index:1;">
+      <!-- Mini mascot -->
+      <div style="display:flex;justify-content:center;margin-bottom:28px;">
+        <div class="mimuu-blob" style="width:100px;height:100px;border-radius:55% 45% 50% 50% / 50% 45% 55% 50%;animation-duration:2.8s;">
+          <div class="mimuu-eyes" style="top:35%;gap:18px;">
+            <div class="mimuu-eye" style="width:16px;height:18px;"></div>
+            <div class="mimuu-eye" style="width:16px;height:18px;"></div>
+          </div>
+          <div class="mimuu-cheeks" style="top:52%;gap:28px;">
+            <div class="mimuu-cheek" style="width:16px;height:9px;"></div>
+            <div class="mimuu-cheek" style="width:16px;height:9px;"></div>
+          </div>
+          <div class="mimuu-mouth" style="width:30px;height:14px;bottom:32%;border-width:3px;"></div>
+        </div>
+      </div>
+      <h2 class="final-cta-title">
+        Pronto para conhecer<br/>
+        <span class="gradient-text">seu Mimuu?</span>
+      </h2>
+      <p class="final-cta-subtitle">
+        Entre na lista de espera e seja um dos primeiros a ter seu assistente pessoal com IA.
+      </p>
+      <div class="final-cta-actions">
+        <a href="#waitlist" class="btn-primary large">
+          Quero entrar na lista ✨
+        </a>
+      </div>
+      <p style="margin-top:20px;color:var(--text-soft);font-size:0.85rem;">
+        Gratuito para entrar na lista · Sem spam · Você avisa quando quiser sair
+      </p>
+    </div>
+  </div>
+</section>
 
-    // preload preview
-    updatePreview(makePayload({ name: 'Lumo', style: 'carinhoso', lang: 'pt-BR', plan: 'monthly' }));
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <span class="footer-logo">Mimuu</span>
+      <span class="footer-sep">·</span>
+      <span class="footer-copy">Pulso AI</span>
+      <span class="footer-sep">·</span>
+      <span class="footer-copy">2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacidade</a>
+      <a href="#">Termos</a>
+      <a href="https://t.me/mimuu_ai" target="_blank" rel="noopener">Telegram</a>
+    </div>
+  </div>
+</footer>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fd = new FormData(form);
-      const data = {
-        name: String(fd.get('name') || '').trim(),
-        style: String(fd.get('style') || 'carinhoso'),
-        lang: String(fd.get('lang') || 'pt-BR'),
-        plan: String(fd.get('plan') || 'monthly'),
-        webhookUrl: String(fd.get('webhookUrl') || '').trim()
-      };
+<script>
+  // ─── Nav scroll shadow ───
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
 
-      if (!data.name) {
-        setStatus('warn', 'Falta o nome do Mimo antes de seguir para checkout.');
-        return;
-      }
+  // ─── Mobile menu ───
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+  function closeMobile() { mobileMenu.classList.remove('open'); }
 
-      const payload = makePayload(data);
-      updatePreview(payload);
-
-      setStatus('warn', 'Checkout simulado aprovado ✅\nEnviando webhook de nascimento...');
-
-      try {
-        const res = await fetch(data.webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(`HTTP ${res.status}: ${txt || 'erro no webhook'}`);
-        }
-
-        const out = await res.json();
-        setStatus(
-          'ok',
-          `Mimo em gestação concluída 🎉\nexternal_id: ${out.external_id || payload.external_id}\n\nPróximo passo admin:\n1) GET /provision/requests\n2) POST /provision/run/{request_id}`
-        );
-      } catch (err) {
-        setStatus(
-          'err',
-          `Não foi possível chamar o webhook agora.\nDetalhe: ${err.message}\n\nSe o backend não estiver rodando, iniciar em :8091 e tentar novamente.`
-        );
+  // ─── Intersection Observer (reveal) ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
       }
     });
-  </script>
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Trigger hero elements on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.hero .reveal-left, .hero .reveal-right').forEach(el => {
+      el.classList.add('visible');
+    });
+  });
+
+  // ─── FAQ accordion ───
+  document.querySelectorAll('[data-faq]').forEach(item => {
+    item.querySelector('.faq-question').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      // close all
+      document.querySelectorAll('[data-faq]').forEach(i => i.classList.remove('open'));
+      // open clicked if it was closed
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // ─── Stagger delays ───
+  document.querySelectorAll('.stagger').forEach(parent => {
+    parent.querySelectorAll(':scope > *').forEach((child, i) => {
+      child.style.transitionDelay = `${i * 80}ms`;
+    });
+  });
+</script>
 </body>
 </html>
