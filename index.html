@@ -717,6 +717,51 @@
       margin-bottom: 4px;
     }
 
+    /* ─── DEEP DIVE ─── */
+    .deep-dive {
+      padding: 100px 0;
+      background: linear-gradient(180deg, var(--cream) 0%, var(--cream-dark) 100%);
+    }
+    .deep-dive-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .deep-dive-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .dd-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 18px 20px;
+      border-radius: 16px;
+      border: 1.5px solid rgba(255,213,79,0.2);
+      box-shadow: var(--shadow-sm);
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .dd-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(255,180,0,0.4);
+    }
+    @media (max-width: 900px) {
+      .deep-dive-inner { grid-template-columns: 1fr; text-align: center; }
+      .deep-dive-inner .section-title { text-align: center !important; }
+      .deep-dive-inner .btn-primary { margin: 0 auto; }
+      .deep-dive-cards { max-width: 400px; margin: 0 auto; }
+    }
+    @media (max-width: 500px) {
+      .deep-dive-cards { grid-template-columns: 1fr; }
+    }
+
     /* ─── FAQ ─── */
     .faq {
       padding: 100px 0;
@@ -1074,6 +1119,51 @@
       <a href="#waitlist" class="btn-primary large">
         Criar meu Mimuu agora
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── APROFUNDE-SE ─── -->
+<section class="deep-dive" id="deep-dive">
+  <div class="container">
+    <div class="deep-dive-inner reveal">
+      <div class="deep-dive-text">
+        <div class="section-tag">Vai além</div>
+        <h2 class="section-title" style="text-align:left;">Quer saber tudo que<br/><span class="gradient-text">seu Mimuu pode fazer?</span></h2>
+        <p style="color:var(--text-mid);font-size:1.05rem;line-height:1.7;margin-bottom:28px;">
+          Desenvolver sistemas, criar campanhas, analisar dados, automatizar processos, gerenciar finanças, escrever documentos... a lista é longa. Veja cada habilidade em detalhe.
+        </p>
+        <a href="/aprofunde-se" class="btn-primary">
+          <i data-lucide="arrow-right" style="width:18px;height:18px;stroke:currentColor;stroke-width:2.5;"></i>
+          Aprofunde-se
+        </a>
+      </div>
+      <div class="deep-dive-cards">
+        <div class="dd-card">
+          <i data-lucide="terminal" style="width:24px;height:24px;stroke:#ff8f00;stroke-width:2.2;"></i>
+          <span>Programação full-stack</span>
+        </div>
+        <div class="dd-card">
+          <i data-lucide="bar-chart-3" style="width:24px;height:24px;stroke:#ff8f00;stroke-width:2.2;"></i>
+          <span>Análise de dados</span>
+        </div>
+        <div class="dd-card">
+          <i data-lucide="pen-tool" style="width:24px;height:24px;stroke:#ff8f00;stroke-width:2.2;"></i>
+          <span>Design e criação visual</span>
+        </div>
+        <div class="dd-card">
+          <i data-lucide="file-text" style="width:24px;height:24px;stroke:#ff8f00;stroke-width:2.2;"></i>
+          <span>Documentos e relatórios</span>
+        </div>
+        <div class="dd-card">
+          <i data-lucide="wallet" style="width:24px;height:24px;stroke:#ff8f00;stroke-width:2.2;"></i>
+          <span>Controle financeiro</span>
+        </div>
+        <div class="dd-card">
+          <i data-lucide="bot" style="width:24px;height:24px;stroke:#ff8f00;stroke-width:2.2;"></i>
+          <span>Automações inteligentes</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>

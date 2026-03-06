@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tudo que o Mimuu pode fazer — Mimuu AI</title>
+  <meta name="description" content="De produtividade pessoal a projetos complexos, tecnologia e criatividade — veja tudo que o Mimuu pode fazer por você." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #fff9ea;
+      color: #1a1a2e;
+      overflow-x: hidden;
+    }
+
+    /* ─── Design Tokens ─── */
+    :root {
+      --yellow: #ffd54f;
+      --yellow-deep: #ffc928;
+      --orange: #ff8f00;
+      --orange-light: #ffb300;
+      --cream: #fff9ea;
+      --cream-dark: #fff3cc;
+      --cream-darker: #ffeaa0;
+      --text-dark: #1a1a2e;
+      --text-mid: #3d3d5c;
+      --text-soft: #6b6b8a;
+      --white: #ffffff;
+      --shadow-sm: 0 2px 12px rgba(255,180,0,0.12);
+      --shadow-md: 0 8px 32px rgba(255,180,0,0.18);
+      --shadow-lg: 0 20px 60px rgba(255,140,0,0.18);
+      --radius: 20px;
+      --radius-lg: 32px;
+    }
+
+    /* ─── Typography ─── */
+    h1, h2, h3, h4 { font-family: 'Baloo 2', cursive; }
+
+    /* ─── Utility ─── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #ff8f00 0%, #ffc928 60%, #ffd54f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Reveal animations ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* ─── Buttons ─── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      color: #1a1a2e;
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 32px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(255,143,0,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(255,143,0,0.45);
+    }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary.large {
+      font-size: 1.1rem;
+      padding: 16px 40px;
+    }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: #1a1a2e;
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 28px;
+      border-radius: 100px;
+      border: 2px solid rgba(255,143,0,0.4);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: #ff8f00;
+      background: rgba(255,143,0,0.06);
+      transform: translateY(-1px);
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      background: rgba(255,249,234,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,200,0,0.12);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 2px 24px rgba(255,180,0,0.12); }
+    .nav-inner {
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .nav-logo-text {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo-dot {
+      width: 8px; height: 8px;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      border-radius: 50%;
+      margin-left: 2px;
+      margin-top: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(255,180,0,0.2);
+      animation: pulse-dot 2.5s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(255,180,0,0.2); }
+      50% { box-shadow: 0 0 0 6px rgba(255,180,0,0.08); }
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #ff8f00; }
+    .nav-cta { margin-left: 16px; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text-dark);
+      border-radius: 4px;
+      transition: 0.3s;
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 68px; left: 0; right: 0;
+      background: rgba(255,249,234,0.98);
+      backdrop-filter: blur(12px);
+      padding: 24px;
+      z-index: 99;
+      border-bottom: 1px solid rgba(255,200,0,0.15);
+      flex-direction: column;
+      gap: 16px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,200,0,0.12);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse at center, rgba(255,213,79,0.22) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,213,79,0.25);
+      border: 1px solid rgba(255,180,0,0.3);
+      color: #ff8f00;
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .hero-title {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-soft);
+      max-width: 540px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    /* ─── SECTION COMMON ─── */
+    .section {
+      padding: 96px 0;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .section-sub {
+      color: var(--text-soft);
+      font-size: 1.05rem;
+      font-weight: 500;
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    /* ─── CATEGORY BLOCK ─── */
+    .category-block {
+      margin-bottom: 80px;
+    }
+    .category-block:last-child { margin-bottom: 0; }
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .category-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #fff3cc, #ffd54f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(255,180,0,0.2);
+    }
+    .category-icon-wrap i {
+      color: #ff8f00;
+      width: 26px; height: 26px;
+    }
+    .category-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+    .category-desc {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* ─── ITEMS GRID ─── */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .item-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      border: 1.5px solid rgba(255,213,79,0.25);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .item-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff8f00, #ffc928);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(255,180,0,0.4);
+    }
+    .item-card:hover::before { opacity: 1; }
+    .item-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: rgba(255,213,79,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .item-icon i {
+      color: #ff8f00;
+      width: 20px; height: 20px;
+    }
+    .item-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .item-desc {
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    /* ─── DIVIDER ─── */
+    .category-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,200,0,0.2), transparent);
+      margin: 80px 0;
+    }
+
+    /* ─── CTA SECTION ─── */
+    .cta-section {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+    .cta-inner {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4e 100%);
+      border-radius: var(--radius-lg);
+      padding: 72px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-inner::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255,213,79,0.12) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .cta-inner::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, rgba(255,143,0,0.10) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .cta-label {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,213,79,0.7);
+      margin-bottom: 16px;
+    }
+    .cta-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-sub {
+      color: rgba(255,255,255,0.6);
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-bottom: 40px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-action {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #1a1a2e;
+      color: rgba(255,255,255,0.5);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.85);
+    }
+    .footer-sep {
+      color: rgba(255,255,255,0.2);
+      margin: 0 8px;
+    }
+    .footer-copy {
+      font-size: 0.85rem;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #ffd54f; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .items-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-inner { padding: 56px 32px; }
+    }
+    @media (max-width: 640px) {
+      .items-grid { grid-template-columns: 1fr; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .section-title { font-size: 1.7rem; }
+      .category-title { font-size: 1.4rem; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+      .cta-inner { padding: 48px 24px; }
+    }
+    @media (max-width: 400px) {
+      .btn-primary.large { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">Mimuu</span>
+      <span class="nav-logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#features">Funcionalidades</a></li>
+      <li><a href="/#how-it-works">Como funciona</a></li>
+      <li><a href="/#faq">FAQ</a></li>
+    </ul>
+    <a href="/#waitlist" class="btn-primary nav-cta">Quero meu Mimuu</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/#features" onclick="closeMobile()">Funcionalidades</a>
+  <a href="/#how-it-works" onclick="closeMobile()">Como funciona</a>
+  <a href="/#faq" onclick="closeMobile()">FAQ</a>
+  <a href="/#waitlist" class="btn-primary" onclick="closeMobile()">Quero meu Mimuu</a>
+</div>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-badge reveal" style="transition-delay:0ms">
+      <i data-lucide="zap" style="width:14px;height:14px;"></i>
+      Guia completo de capacidades
+    </div>
+    <h1 class="hero-title reveal" style="transition-delay:80ms">
+      Tudo que seu Mimuu<br /><span class="gradient-text">pode fazer</span>
+    </h1>
+    <p class="hero-subtitle reveal" style="transition-delay:160ms">
+      De tarefas simples a projetos complexos — um assistente que cresce com você.
+    </p>
+  </div>
+</section>
+
+<!-- ─── CAPABILITIES ─── -->
+<section class="section">
+  <div class="container">
+
+    <!-- 1. Produtividade Pessoal -->
+    <div class="category-block">
+      <div class="category-header reveal">
+        <div class="category-icon-wrap">
+          <i data-lucide="calendar-check"></i>
+        </div>
+        <div>
+          <h2 class="category-title">Produtividade Pessoal</h2>
+          <p class="category-desc">Organiza o dia a dia sem esforço, do calendário aos hábitos.</p>
+        </div>
+      </div>
+      <div class="items-grid stagger">
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="calendar"></i></div>
+          <h3 class="item-title">Agenda e compromissos</h3>
+          <p class="item-desc">Cria, edita e cancela eventos no Google Calendar simplesmente conversando. Basta dizer "marca uma reunião amanhã às 15h com o João" e o Mimuu cuida do resto — convites incluídos.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="bell"></i></div>
+          <h3 class="item-title">Lembretes inteligentes</h3>
+          <p class="item-desc">Entende linguagem natural como "me lembra disso amanhã de manhã" ou "avisa 30 minutos antes da reunião". O Mimuu interpreta o contexto e te avisa no momento certo, pelo Telegram.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="mail"></i></div>
+          <h3 class="item-title">Emails</h3>
+          <p class="item-desc">Lê, resume e filtra a caixa de entrada do Gmail por você. Escreve respostas profissionais com base no histórico da conversa e aplica labels e arquivamentos automáticos para manter tudo organizado.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="check-square"></i></div>
+          <h3 class="item-title">Tarefas e listas</h3>
+          <p class="item-desc">Gerencia to-dos, checklists e prioridades do jeito que você fala. Pergunta o que ainda está pendente, reordena itens por urgência e avisa quando alguma tarefa importante está próxima do prazo.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="activity"></i></div>
+          <h3 class="item-title">Controle de rotina</h3>
+          <p class="item-desc">Acompanha hábitos, treinos e medicamentos com base nas metas que você define. Faz check-ins periódicos, registra seu progresso e te dá um resumo semanal sem precisar preencher planilha nenhuma.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-divider"></div>
+
+    <!-- 2. Trabalho e Negócios -->
+    <div class="category-block">
+      <div class="category-header reveal">
+        <div class="category-icon-wrap">
+          <i data-lucide="briefcase"></i>
+        </div>
+        <div>
+          <h2 class="category-title">Trabalho e Negócios</h2>
+          <p class="category-desc">Um assistente de alto nível para quem trabalha com resultado.</p>
+        </div>
+      </div>
+      <div class="items-grid stagger">
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="megaphone"></i></div>
+          <h3 class="item-title">Campanhas de marketing</h3>
+          <p class="item-desc">Cria copy, estratégia de conteúdo e posts prontos para redes sociais com base no seu nicho e tom de voz. Do Instagram ao LinkedIn, entrega textos que convertem — é só revisar e publicar.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="file-text"></i></div>
+          <h3 class="item-title">Relatórios e documentos</h3>
+          <p class="item-desc">Gera PDFs, planilhas e apresentações profissionais a partir de um briefing ou conjunto de dados brutos. Estrutura o conteúdo, formata visualmente e entrega pronto para enviar ao cliente.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="bar-chart-2"></i></div>
+          <h3 class="item-title">Pesquisa de mercado</h3>
+          <p class="item-desc">Busca dados atualizados na internet, analisa a concorrência e monta benchmarks comparativos. Em minutos você tem um panorama do mercado que levaria horas para compilar manualmente.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="send"></i></div>
+          <h3 class="item-title">Follow-ups automáticos</h3>
+          <p class="item-desc">Lembra de cobrar clientes, enviar propostas no prazo certo e dar retorno a contatos importantes. Define sequências de acompanhamento e avisa quando chegou a hora de agir.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="users"></i></div>
+          <h3 class="item-title">CRM pessoal</h3>
+          <p class="item-desc">Mantém registro de contatos, interações anteriores e próximos passos de cada relacionamento comercial. Basta perguntar "o que combinei com a Maria?" e o Mimuu traz o histórico completo.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-divider"></div>
+
+    <!-- 3. Tecnologia e Desenvolvimento -->
+    <div class="category-block">
+      <div class="category-header reveal">
+        <div class="category-icon-wrap">
+          <i data-lucide="code-2"></i>
+        </div>
+        <div>
+          <h2 class="category-title">Tecnologia e Desenvolvimento</h2>
+          <p class="category-desc">Seu co-piloto técnico — de scripts rápidos a sistemas completos.</p>
+        </div>
+      </div>
+      <div class="items-grid stagger">
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="terminal"></i></div>
+          <h3 class="item-title">Desenvolvimento de sistemas</h3>
+          <p class="item-desc">Cria sites, apps, APIs e automações do zero com base na sua descrição. Escreve código limpo e comentado, sugere a stack ideal para o projeto e entrega pronto para rodar.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="bug"></i></div>
+          <h3 class="item-title">Debug e suporte técnico</h3>
+          <p class="item-desc">Analisa mensagens de erro, identifica a causa raiz e sugere correções precisas. Cola o stack trace, o Mimuu explica o que aconteceu e como resolver — sem ficar procurando no Stack Overflow.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="workflow"></i></div>
+          <h3 class="item-title">Automações</h3>
+          <p class="item-desc">Conecta serviços, cria workflows e programa tarefas recorrentes. Integra APIs externas, move dados entre sistemas e elimina trabalho manual repetitivo — tudo configurável por conversa.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="database"></i></div>
+          <h3 class="item-title">Análise de dados</h3>
+          <p class="item-desc">Processa planilhas, gera gráficos e identifica padrões em conjuntos de dados. Responde perguntas como "qual produto vendeu mais em março?" com análise real, não chute.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="server"></i></div>
+          <h3 class="item-title">Deploy e infraestrutura</h3>
+          <p class="item-desc">Ajuda a configurar servidores, fazer deploy de aplicações e monitorar serviços em produção. Gera scripts de CI/CD, configura ambientes e diagnostica problemas de infraestrutura.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-divider"></div>
+
+    <!-- 4. Criatividade e Conteúdo -->
+    <div class="category-block">
+      <div class="category-header reveal">
+        <div class="category-icon-wrap">
+          <i data-lucide="palette"></i>
+        </div>
+        <div>
+          <h2 class="category-title">Criatividade e Conteúdo</h2>
+          <p class="category-desc">Da ideia à entrega — textos, imagens, vídeos e muito mais.</p>
+        </div>
+      </div>
+      <div class="items-grid stagger">
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="pen-line"></i></div>
+          <h3 class="item-title">Escrita criativa</h3>
+          <p class="item-desc">Escreve textos, roteiros, legendas, artigos e bios no seu estilo. Adapta o tom para cada plataforma — mais informal no Instagram, mais técnico no LinkedIn — e entrega pronto para publicar.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="image"></i></div>
+          <h3 class="item-title">Design visual</h3>
+          <p class="item-desc">Cria imagens, logos, thumbnails e infográficos com base em uma descrição. Gera variações de conceito, sugere paletas de cores e entrega arquivos prontos para uso nas redes sociais.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="video"></i></div>
+          <h3 class="item-title">Vídeos</h3>
+          <p class="item-desc">Gera roteiros completos, edita sequências e monta reels e shorts automaticamente. Inclui cortes, legendas e trilha sonora sugerida — do briefing ao vídeo final sem abrir editor de vídeo.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="languages"></i></div>
+          <h3 class="item-title">Tradução e adaptação</h3>
+          <p class="item-desc">Traduz conteúdo mantendo o tom, o contexto e as nuances culturais. Vai além da tradução literal — adapta expressões, ajusta o registro e entrega um texto que soa natural no idioma de destino.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="lightbulb"></i></div>
+          <h3 class="item-title">Brainstorming</h3>
+          <p class="item-desc">Gera ideias, nomes, slogans e conceitos criativos a partir de um briefing ou contexto. Explora ângulos diferentes, apresenta opções com justificativas e itera até chegar no conceito certo.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-divider"></div>
+
+    <!-- 5. Vida Pessoal -->
+    <div class="category-block">
+      <div class="category-header reveal">
+        <div class="category-icon-wrap">
+          <i data-lucide="heart"></i>
+        </div>
+        <div>
+          <h2 class="category-title">Vida Pessoal</h2>
+          <p class="category-desc">Para o lado de lá do trabalho — a vida que realmente importa.</p>
+        </div>
+      </div>
+      <div class="items-grid stagger">
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="wallet"></i></div>
+          <h3 class="item-title">Finanças</h3>
+          <p class="item-desc">Controla gastos, organiza boletos e acompanha o orçamento mensal. Categoriza despesas automaticamente, alerta quando algo está saindo do planejado e dá uma visão clara de pra onde vai o dinheiro.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="stethoscope"></i></div>
+          <h3 class="item-title">Saúde e bem-estar</h3>
+          <p class="item-desc">Lembra de tomar remédios, acompanha a evolução dos treinos e sugere receitas com base nos ingredientes disponíveis ou nas suas metas alimentares. Cuida de você sem precisar pedir.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="plane"></i></div>
+          <h3 class="item-title">Viagens</h3>
+          <p class="item-desc">Pesquisa destinos, monta roteiros detalhados por dia e compara preços de passagens e hotéis. Inclui dicas locais, clima na época da viagem e lista de documentos necessários — planejamento completo.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="book-open"></i></div>
+          <h3 class="item-title">Estudos</h3>
+          <p class="item-desc">Resume materiais extensos, cria flashcards para memorização e responde dúvidas de qualquer assunto. Explica conceitos de formas diferentes até você entender, sem julgamento e sem pressa.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="home"></i></div>
+          <h3 class="item-title">Casa e família</h3>
+          <p class="item-desc">Mantém listas de compras atualizadas, organiza agendamentos de serviços domésticos e coordena tarefas da casa e da família. Centraliza tudo numa conversa, sem precisar de app extra.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-divider"></div>
+
+    <!-- 6. Inteligência e Evolução -->
+    <div class="category-block">
+      <div class="category-header reveal">
+        <div class="category-icon-wrap">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div>
+          <h2 class="category-title">Inteligência e Evolução</h2>
+          <p class="category-desc">Um assistente que aprende, se adapta e fica mais poderoso com o tempo.</p>
+        </div>
+      </div>
+      <div class="items-grid stagger">
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="brain"></i></div>
+          <h3 class="item-title">Memória de longo prazo</h3>
+          <p class="item-desc">Quanto mais você usa, mais o Mimuu te conhece. Lembra de preferências, decisões passadas e contexto de projetos — sem precisar repetir o que já foi dito. O assistente evolui junto com você.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="puzzle"></i></div>
+          <h3 class="item-title">Skills instaláveis</h3>
+          <p class="item-desc">Aprende novas habilidades conforme sua necessidade. Precisa que o Mimuu integre com um novo serviço, aprenda sobre o seu setor ou domine um novo formato? É só instalar o skill certo.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="search"></i></div>
+          <h3 class="item-title">Pesquisa em tempo real</h3>
+          <p class="item-desc">Busca na internet, cruza fontes diferentes e cita referências confiáveis. Não inventa — entrega informação atualizada com links para verificar, diferente dos assistentes que ficam presos em dados antigos.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="scan-eye"></i></div>
+          <h3 class="item-title">Análise de imagens</h3>
+          <p class="item-desc">Entende fotos, documentos escaneados e prints de tela. Extrai texto, interpreta gráficos, identifica produtos e responde perguntas sobre qualquer imagem que você mandar no chat.</p>
+        </div>
+        <div class="item-card reveal">
+          <div class="item-icon"><i data-lucide="sliders-horizontal"></i></div>
+          <h3 class="item-title">Personalidade adaptável</h3>
+          <p class="item-desc">Ajusta o tom, a formalidade e o estilo de comunicação ao seu gosto. Mais objetivo quando você está com pressa, mais detalhado quando quer entender a fundo — o Mimuu se calibra pra você.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <p class="cta-label">Pronto para começar</p>
+      <h2 class="cta-title">Convencido?</h2>
+      <p class="cta-sub">Entre na lista e seja um dos primeiros a ter seu Mimuu.</p>
+      <div class="cta-action">
+        <a href="/#waitlist" class="btn-primary large">
+          <i data-lucide="arrow-right" style="width:18px;height:18px;"></i>
+          Quero meu Mimuu
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <span class="footer-logo">Mimuu</span>
+      <span class="footer-sep">·</span>
+      <span class="footer-copy">Pulso AI</span>
+      <span class="footer-sep">·</span>
+      <span class="footer-copy">2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacidade</a>
+      <a href="#">Termos</a>
+      <a href="https://t.me/mimuu_ai" target="_blank" rel="noopener">Telegram</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── Nav scroll shadow ───
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  // ─── Mobile menu ───
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+  function closeMobile() { mobileMenu.classList.remove('open'); }
+
+  // ─── Intersection Observer (reveal) ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.10, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Trigger hero elements on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.hero .reveal').forEach(el => {
+      el.classList.add('visible');
+    });
+  });
+
+  // ─── Stagger delays ───
+  document.querySelectorAll('.stagger').forEach(parent => {
+    parent.querySelectorAll(':scope > *').forEach((child, i) => {
+      child.style.transitionDelay = `${i * 80}ms`;
+    });
+  });
+
+  // ─── Lucide icons ───
+  lucide.createIcons();
+</script>
+</body>
+</html>
