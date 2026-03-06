@@ -1,0 +1,8 @@
+{
+  "name": "mimuu-website",
+  "version": "1.0.0",
+  "description": "Mimuu AI Landing Page",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'"
+  }
+}

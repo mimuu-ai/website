@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mimuu — Seu assistente nasce em minutos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff9ea;
+      --card: #ffffff;
+      --text: #2a2a2a;
+      --muted: #6f695f;
+      --line: #f0e4c8;
+      --yellow: #ffd54f;
+      --yellow-2: #ffc928;
+      --accent: #ff8f00;
+      --green: #0f8f60;
+      --lav: #f4f1ff;
+      --shadow: 0 14px 34px rgba(198, 152, 0, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 520px at 100% -10%, #fff1bb 0%, transparent 60%),
+        radial-gradient(900px 620px at -5% 24%, #fff5d1 0%, transparent 56%),
+        var(--bg);
+    }
+
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 24px; }
+
+    .nav {
+      position: sticky; top: 12px; z-index: 10;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 11px 14px;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 9px;
+      font-family: 'Baloo 2', cursive;
+      font-size: 30px; font-weight: 800;
+    }
+
+    .dot {
+      width: 22px; height: 22px; border-radius: 999px;
+      background: var(--yellow); border: 2px solid #efb500;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,.6);
+    }
+
+    .actions { display: flex; gap: 10px; }
+
+    .btn {
+      border: 0; border-radius: 14px; padding: 12px 18px;
+      font-family: inherit; font-weight: 800; cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn.main {
+      background: linear-gradient(180deg, var(--yellow), var(--yellow-2));
+      box-shadow: 0 6px 0 #dfa700;
+      color: #2d2502;
+    }
+
+    .btn.ghost {
+      background: #fff;
+      border: 1px solid var(--line);
+      color: #4b463d;
+    }
+
+    .hero {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-family: 'Baloo 2', cursive;
+      font-size: 60px;
+      line-height: .95;
+      letter-spacing: -0.02em;
+    }
+
+    .hl { color: var(--accent); }
+    .sub { font-size: 20px; color: var(--muted); margin-bottom: 16px; }
+
+    .trust-line {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      background: #fff6d6;
+      border: 1px solid #f4dfae;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .social-proof {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .proof {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: #fffdf4;
+    }
+
+    .proof .n {
+      font-family: 'Baloo 2', cursive;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .proof .l { color: var(--muted); font-size: 14px; font-weight: 700; }
+
+    .mascot-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      top: 40px;
+      background: radial-gradient(circle, #ffe082 0%, transparent 65%);
+      filter: blur(8px);
+    }
+
+    .mascot {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      border-radius: 48% 52% 50% 50%;
+      background: linear-gradient(180deg, #ffe168, #ffc928);
+      border: 4px solid #f2b500;
+      box-shadow: 0 20px 32px rgba(241, 166, 0, .28);
+      animation: float 2.8s ease-in-out infinite;
+    }
+
+    .eye { position: absolute; top: 100px; width: 16px; height: 24px; border-radius: 999px; background: #2f2f2f; }
+    .eye.l { left: 80px; }
+    .eye.r { right: 80px; }
+    .mouth {
+      position: absolute; left: 50%; top: 138px;
+      transform: translateX(-50%);
+      width: 36px; height: 17px;
+      border-bottom: 4px solid #2f2f2f; border-radius: 0 0 30px 30px;
+    }
+
+    .cheek { position: absolute; top: 131px; width: 22px; height: 12px; border-radius: 999px; background: #ffaf9d; opacity: .72; }
+    .cheek.l { left: 52px; }
+    .cheek.r { right: 52px; }
+
+    .star { position: absolute; right: 14px; top: 22px; font-size: 34px; transform: rotate(15deg); }
+
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-11px); } }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-family: 'Baloo 2', cursive;
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .quote {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 15px;
+    }
+
+    .quote b { display: block; margin-top: 8px; font-size: 13px; color: #5b5349; }
+
+    .onboarding {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    input[type="text"], select, input[type="url"] {
+      width: 100%;
+      border: 1px solid #e8ddc3;
+      background: #fffef9;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      color: inherit;
+    }
+
+    .styles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .style-option {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid #e9dfc7;
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .style-option input { accent-color: #e6a800; }
+
+    .status {
+      margin-top: 12px;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .status.ok { display: block; background: #eafaf3; border: 1px solid #bde8d1; color: #136b47; }
+    .status.warn { display: block; background: #fff6e8; border: 1px solid #f8d8a6; color: #8b5d00; }
+    .status.err { display: block; background: #ffecec; border: 1px solid #ffc2c2; color: #8e1f1f; }
+
+    .flow {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .flow .node {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffdf7;
+      padding: 12px;
+      position: relative;
+      min-height: 116px;
+    }
+
+    .flow .node:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      color: #d39a00;
+      z-index: 1;
+    }
+
+    .faq {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px 14px;
+    }
+
+    summary { font-weight: 800; cursor: pointer; }
+    details p { color: var(--muted); margin: 8px 0 0; }
+
+    .final-cta {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: linear-gradient(130deg, #fff8d9, #fff0be);
+      border: 1px solid #f2dc96;
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .small { font-size: 13px; color: #6c6558; margin-top: 6px; }
+
+    @media (max-width: 960px) {
+      .hero, .onboarding { grid-template-columns: 1fr; }
+      h1 { font-size: 46px; }
+      .social-proof, .quotes { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .flow .node:not(:last-child)::after { content: "↓"; right: 50%; top: unset; bottom: -18px; transform: translateX(50%); }
+      .final-cta { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <div class="brand"><span class="dot"></span> Mimo</div>
+      <div class="actions">
+        <button class="btn ghost" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</button>
+        <button class="btn main" onclick="document.getElementById('onboarding').scrollIntoView({behavior:'smooth'})">Criar meu Mimo</button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="card">
+        <h1>Seu assistente <span class="hl">nasce hoje</span>, em menos de 2 minutos.</h1>
+        <p class="sub">Mimo organiza rotina, lembra compromissos e conversa no estilo que combina com cada pessoa — direto no Telegram.</p>
+        <button class="btn main" onclick="document.getElementById('onboarding').scrollIntoView({behavior:'smooth'})">Quero meu Mimo agora</button>
+
+        <div class="trust-line">
+          <span class="pill">✅ Setup guiado em 3 passos</span>
+          <span class="pill">💬 Personalidade customizada</span>
+          <span class="pill">🔒 Instância privada</span>
+        </div>
+
+        <div class="social-proof">
+          <div class="proof"><div class="n">1.240+</div><div class="l">Mimos em gestação no beta</div></div>
+          <div class="proof"><div class="n">4,9/5</div><div class="l">Satisfação média dos testers</div></div>
+          <div class="proof"><div class="n">97%</div><div class="l">ativaram no mesmo dia</div></div>
+        </div>
+      </div>
+
+      <div class="card mascot-wrap">
+        <div class="glow"></div>
+        <div class="mascot" aria-label="Mascote Mimo">
+          <span class="star">✨</span>
+          <span class="eye l"></span>
+          <span class="eye r"></span>
+          <span class="cheek l"></span>
+          <span class="cheek r"></span>
+          <span class="mouth"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h2 class="section-title">Prova social real de uso diário</h2>
+      <div class="quotes">
+        <div class="quote">“Parei de esquecer pagamento e compromisso. O Mimo parece que mora no meu bolso.”<b>— Marina, designer</b></div>
+        <div class="quote">“Em 1 dia já coloquei rotina de treino, boleto e lembrete de follow-up de cliente.”<b>— Rafael, autônomo</b></div>
+        <div class="quote">“A linguagem em PT-BR e o tom amigável fizeram diferença pra eu usar todo dia.”<b>— Denise, professora</b></div>
+      </div>
+    </section>
+
+    <section id="onboarding" class="onboarding">
+      <article class="card">
+        <h2 class="section-title">Onboarding inicial do Mimo</h2>
+        <p class="sub" style="font-size:16px;margin-top:0">Preencher para gerar os dados do checkout e enviar ao webhook após pagamento aprovado.</p>
+
+        <form id="birthForm">
+          <div class="form-group">
+            <label for="name">Nome do Mimo</label>
+            <input id="name" name="name" type="text" placeholder="Ex.: Lumo" required />
+          </div>
+
+          <div class="form-group">
+            <label>Estilo de personalidade</label>
+            <div class="styles">
+              <label class="style-option"><input type="radio" name="style" value="carinhoso" checked> Carinhoso</label>
+              <label class="style-option"><input type="radio" name="style" value="produtivo"> Produtivo</label>
+              <label class="style-option"><input type="radio" name="style" value="engracado"> Engraçado</label>
+              <label class="style-option"><input type="radio" name="style" value="coach"> Coach leve</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lang">Idioma principal</label>
+            <select id="lang" name="lang">
+              <option value="pt-BR" selected>Português (Brasil)</option>
+              <option value="en-US">English (US)</option>
+              <option value="es-ES">Español</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="plan">Plano</label>
+            <select id="plan" name="plan">
+              <option value="monthly" selected>Mensal — R$49</option>
+              <option value="yearly">Anual — R$39/mês</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="webhookUrl">Webhook de pagamento aprovado</label>
+            <input id="webhookUrl" name="webhookUrl" type="url" value="http://localhost:8091/webhooks/payment" />
+          </div>
+
+          <button class="btn main" type="submit">Ir para checkout</button>
+          <div class="small">No MVP, “checkout” é simulado. Depois do clique, o front dispara webhook com o payload do nascimento.</div>
+        </form>
+
+        <div id="status" class="status"></div>
+      </article>
+
+      <article class="card">
+        <h2 class="section-title">Fluxo visual: checkout → webhook</h2>
+        <div class="flow">
+          <div class="node"><b>1) Onboarding</b><br/>Nome + estilo + idioma.<br/><small>Dados da identidade do Mimo.</small></div>
+          <div class="node"><b>2) Checkout</b><br/>Pagamento aprovado.<br/><small>Gera external_id.</small></div>
+          <div class="node"><b>3) Webhook</b><br/>POST em <code>/webhooks/payment</code>.<br/><small>Cria request pendente.</small></div>
+          <div class="node"><b>4) Provision</b><br/>Admin roda <code>/provision/run/{id}</code>.<br/><small>Status vira provisioned.</small></div>
+        </div>
+
+        <div style="margin-top:14px;padding:12px;border-radius:12px;background:var(--lav);border:1px solid #dfd7fb;font-size:14px">
+          <b>Payload enviado no webhook:</b>
+          <pre id="payloadPreview" style="white-space:pre-wrap;margin:8px 0 0;font-size:12px"></pre>
+        </div>
+      </article>
+    </section>
+
+    <section id="faq" class="card">
+      <h2 class="section-title">FAQ rápido</h2>
+      <div class="faq">
+        <details>
+          <summary>Quanto tempo até o Mimo ficar ativo?</summary>
+          <p>No MVP, segundos após o pagamento + execução do provisionamento. Em produção, a meta é ativação automática em até 2 minutos.</p>
+        </details>
+        <details>
+          <summary>Precisa instalar app?</summary>
+          <p>Não. O uso principal é no Telegram, então a ativação acontece por link e conversa direta com o bot.</p>
+        </details>
+        <details>
+          <summary>Consigo mudar personalidade e idioma depois?</summary>
+          <p>Sim. Nome, estilo e idioma podem ser ajustados no painel de configurações após o nascimento inicial.</p>
+        </details>
+      </div>
+
+      <div class="final-cta">
+        <div>
+          <div style="font-weight:800;font-size:22px">Pronto para fazer nascer o primeiro Mimo?</div>
+          <div class="small">Ativação guiada, onboarding simples e fluxo de webhook pronto para integrar.</div>
+        </div>
+        <button class="btn main" onclick="document.getElementById('onboarding').scrollIntoView({behavior:'smooth'})">Começar agora</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const payloadPreview = document.getElementById('payloadPreview');
+    const form = document.getElementById('birthForm');
+
+    function externalId() {
+      return `mimo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function tokenFromName(name) {
+      return `${name.toLowerCase().replace(/[^a-z0-9]/gi, '') || 'mimo'}_telegram_token_mvp`;
+    }
+
+    function setStatus(type, text) {
+      statusEl.className = `status ${type}`;
+      statusEl.textContent = text;
+    }
+
+    function makePayload(data) {
+      return {
+        external_id: externalId(),
+        customer_name: data.name,
+        customer_contact: 'checkout@mimo.local',
+        telegram_token: tokenFromName(data.name),
+        mimo_style: data.style,
+        mimo_language: data.lang,
+        plan: data.plan
+      };
+    }
+
+    function updatePreview(payload) {
+      payloadPreview.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    // preload preview
+    updatePreview(makePayload({ name: 'Lumo', style: 'carinhoso', lang: 'pt-BR', plan: 'monthly' }));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const data = {
+        name: String(fd.get('name') || '').trim(),
+        style: String(fd.get('style') || 'carinhoso'),
+        lang: String(fd.get('lang') || 'pt-BR'),
+        plan: String(fd.get('plan') || 'monthly'),
+        webhookUrl: String(fd.get('webhookUrl') || '').trim()
+      };
+
+      if (!data.name) {
+        setStatus('warn', 'Falta o nome do Mimo antes de seguir para checkout.');
+        return;
+      }
+
+      const payload = makePayload(data);
+      updatePreview(payload);
+
+      setStatus('warn', 'Checkout simulado aprovado ✅\nEnviando webhook de nascimento...');
+
+      try {
+        const res = await fetch(data.webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`HTTP ${res.status}: ${txt || 'erro no webhook'}`);
+        }
+
+        const out = await res.json();
+        setStatus(
+          'ok',
+          `Mimo em gestação concluída 🎉\nexternal_id: ${out.external_id || payload.external_id}\n\nPróximo passo admin:\n1) GET /provision/requests\n2) POST /provision/run/{request_id}`
+        );
+      } catch (err) {
+        setStatus(
+          'err',
+          `Não foi possível chamar o webhook agora.\nDetalhe: ${err.message}\n\nSe o backend não estiver rodando, iniciar em :8091 e tentar novamente.`
+        );
+      }
+    });
+  </script>
+</body>
+</html>
