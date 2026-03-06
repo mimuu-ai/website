@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* ─── Reset & Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -960,10 +961,10 @@
           </a>
         </div>
         <div class="hero-trust">
-          <div class="trust-pill">100% em PT-BR</div>
-          <div class="trust-pill">Direto no Telegram</div>
-          <div class="trust-pill">Lembra de você</div>
-          <div class="trust-pill">Respostas rápidas</div>
+          <div class="trust-pill"><i data-lucide="globe" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.2;vertical-align:-3px;margin-right:4px;"></i> 100% em PT-BR</div>
+          <div class="trust-pill"><i data-lucide="send" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.2;vertical-align:-3px;margin-right:4px;"></i> Direto no Telegram</div>
+          <div class="trust-pill"><i data-lucide="heart" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.2;vertical-align:-3px;margin-right:4px;"></i> Lembra de você</div>
+          <div class="trust-pill"><i data-lucide="zap" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.2;vertical-align:-3px;margin-right:4px;"></i> Respostas rápidas</div>
         </div>
       </div>
       <!-- Right: mascot -->
@@ -1011,32 +1012,32 @@
     </div>
     <div class="features-grid stagger">
       <div class="feature-card reveal" style="--i:0">
-        <div class="feature-icon" style="font-size:1.6rem;font-weight:800;">{ }</div>
+        <div class="feature-icon"><i data-lucide="code-2" style="width:28px;height:28px;stroke:#ff8f00;stroke-width:2.2;"></i></div>
         <div class="feature-title">Desenvolve sistemas completos</div>
         <p class="feature-desc">Precisa de um site, app ou automação? Seu Mimuu programa, testa e entrega — do zero ao deploy, conversando com você.</p>
       </div>
       <div class="feature-card reveal" style="--i:1">
-        <div class="feature-icon" style="font-size:1.6rem;font-weight:800;">M</div>
+        <div class="feature-icon"><i data-lucide="megaphone" style="width:28px;height:28px;stroke:#ff8f00;stroke-width:2.2;"></i></div>
         <div class="feature-title">Cria campanhas de marketing</div>
         <p class="feature-desc">Copy para redes sociais, estratégia de conteúdo, análise de concorrência. Seu departamento de marketing particular.</p>
       </div>
       <div class="feature-card reveal" style="--i:2">
-        <div class="feature-icon" style="font-size:1.6rem;font-weight:800;">@</div>
+        <div class="feature-icon"><i data-lucide="mail" style="width:28px;height:28px;stroke:#ff8f00;stroke-width:2.2;"></i></div>
         <div class="feature-title">Email, agenda e Drive integrados</div>
         <p class="feature-desc">Lê emails, gerencia compromissos, acessa planilhas e atualiza arquivos. Tudo pelo chat, sem sair do Telegram.</p>
       </div>
       <div class="feature-card reveal" style="--i:3">
-        <div class="feature-icon" style="font-size:1.6rem;font-weight:800;">~</div>
+        <div class="feature-icon"><i data-lucide="search" style="width:28px;height:28px;stroke:#ff8f00;stroke-width:2.2;"></i></div>
         <div class="feature-title">Pesquisa e analisa qualquer tema</div>
         <p class="feature-desc">Busca na internet em tempo real, cruza fontes, resume artigos e monta relatórios. Seu analista pessoal 24h.</p>
       </div>
       <div class="feature-card reveal" style="--i:4">
-        <div class="feature-icon" style="font-size:1.6rem;font-weight:800;">+</div>
+        <div class="feature-icon"><i data-lucide="puzzle" style="width:28px;height:28px;stroke:#ff8f00;stroke-width:2.2;"></i></div>
         <div class="feature-title">Aprende habilidades novas</div>
         <p class="feature-desc">Seu Mimuu instala novas skills conforme sua necessidade — de finanças a culinária, de jurídico a fitness. Ele evolui com você.</p>
       </div>
       <div class="feature-card reveal" style="--i:5">
-        <div class="feature-icon" style="font-size:1.6rem;font-weight:800;">*</div>
+        <div class="feature-icon"><i data-lucide="brain" style="width:28px;height:28px;stroke:#ff8f00;stroke-width:2.2;"></i></div>
         <div class="feature-title">Memória de longo prazo</div>
         <p class="feature-desc">Lembra de tudo: suas preferências, projetos, rotina, contatos. Quanto mais tempo juntos, mais inteligente e pessoal ele fica.</p>
       </div>
@@ -1305,6 +1306,9 @@
       child.style.transitionDelay = `${i * 80}ms`;
     });
   });
+
+  // ─── Lucide icons ───
+  lucide.createIcons();
 </script>
 </body>
 </html>
