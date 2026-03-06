@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="100%" stop-color="#ffc928"/>
+    </radialGradient>
+  </defs>
+  <!-- Body -->
+  <ellipse cx="256" cy="280" rx="200" ry="210" fill="url(#g)"/>
+  <!-- Left eye -->
+  <ellipse cx="195" cy="240" rx="22" ry="28" fill="#1a1a2e"/>
+  <ellipse cx="190" cy="232" rx="8" ry="10" fill="white" opacity="0.9"/>
+  <!-- Right eye -->
+  <ellipse cx="317" cy="240" rx="22" ry="28" fill="#1a1a2e"/>
+  <ellipse cx="312" cy="232" rx="8" ry="10" fill="white" opacity="0.9"/>
+  <!-- Left cheek -->
+  <ellipse cx="160" cy="300" rx="30" ry="16" fill="#ffb74d" opacity="0.5"/>
+  <!-- Right cheek -->
+  <ellipse cx="352" cy="300" rx="30" ry="16" fill="#ffb74d" opacity="0.5"/>
+  <!-- Mouth -->
+  <path d="M220 320 Q256 365 292 320" fill="none" stroke="#1a1a2e" stroke-width="8" stroke-linecap="round"/>
+</svg>
