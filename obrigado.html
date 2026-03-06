@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Você está na lista! — Mimuu</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #fff9ea;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+    }
+    h1, h2 { font-family: 'Baloo 2', cursive; }
+    .container { max-width: 520px; }
+    .gradient-text {
+      background: linear-gradient(135deg, #ff8f00 0%, #ffc928 60%, #ffd54f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .mimuu-blob {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #ffe066 0%, #ffc928 50%, #ffb300 100%);
+      border-radius: 55% 45% 50% 50% / 50% 45% 55% 50%;
+      position: relative;
+      margin: 0 auto 32px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .mimuu-eyes {
+      position: absolute; top: 35%; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 18px;
+    }
+    .mimuu-eye {
+      width: 16px; height: 18px; background: #1a1a2e; border-radius: 50%;
+      position: relative;
+    }
+    .mimuu-eye::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 6px; height: 7px; background: white; border-radius: 50%; opacity: 0.9;
+    }
+    .mimuu-cheeks {
+      position: absolute; top: 52%; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 28px;
+    }
+    .mimuu-cheek { width: 16px; height: 9px; background: rgba(255,183,77,0.45); border-radius: 50%; }
+    .mimuu-mouth {
+      position: absolute; bottom: 32%; left: 50%; transform: translateX(-50%);
+      width: 30px; height: 14px;
+      border-bottom: 3px solid #1a1a2e; border-radius: 0 0 50% 50%;
+    }
+    h1 { font-size: 2rem; margin-bottom: 12px; }
+    p { font-size: 1.1rem; color: #3d3d5c; line-height: 1.7; margin-bottom: 24px; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      color: #1a1a2e; font-family: 'Baloo 2', cursive; font-weight: 700;
+      font-size: 1rem; padding: 14px 32px; border-radius: 100px;
+      text-decoration: none; box-shadow: 0 4px 20px rgba(255,143,0,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,143,0,0.4); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="mimuu-blob">
+      <div class="mimuu-eyes">
+        <div class="mimuu-eye"></div>
+        <div class="mimuu-eye"></div>
+      </div>
+      <div class="mimuu-cheeks">
+        <div class="mimuu-cheek"></div>
+        <div class="mimuu-cheek"></div>
+      </div>
+      <div class="mimuu-mouth"></div>
+    </div>
+    <h1>Você está na lista! <span class="gradient-text">🎉</span></h1>
+    <p>Recebemos sua inscrição. Fique de olho no email — em breve vamos te chamar pra conhecer seu Mimuu.</p>
+    <a href="/" class="btn-primary">Voltar para o site</a>
+  </div>
+</body>
+</html>

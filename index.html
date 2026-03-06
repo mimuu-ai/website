@@ -1321,12 +1321,35 @@
       <p class="final-cta-subtitle">
         Entre na lista de espera e seja um dos primeiros a ter seu assistente pessoal com IA.
       </p>
-      <div class="final-cta-actions">
-        <a href="#waitlist" class="btn-primary large">
+      <!-- Waitlist Form -->
+      <form id="waitlist-form" action="https://formsubmit.co/victor@mimuu.ai" method="POST" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px;">
+        <input type="hidden" name="_subject" value="Nova inscrição na waitlist do Mimuu!" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" value="https://mimuu.ai/obrigado" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="text" name="name" placeholder="Seu nome" required style="
+          padding:14px 20px;border-radius:100px;border:2px solid rgba(255,213,79,0.3);
+          background:white;font-family:'Nunito',sans-serif;font-size:1rem;color:var(--text-dark);
+          outline:none;transition:border-color 0.2s;
+        " onfocus="this.style.borderColor='#ff8f00'" onblur="this.style.borderColor='rgba(255,213,79,0.3)'" />
+        <input type="email" name="email" placeholder="Seu melhor email" required style="
+          padding:14px 20px;border-radius:100px;border:2px solid rgba(255,213,79,0.3);
+          background:white;font-family:'Nunito',sans-serif;font-size:1rem;color:var(--text-dark);
+          outline:none;transition:border-color 0.2s;
+        " onfocus="this.style.borderColor='#ff8f00'" onblur="this.style.borderColor='rgba(255,213,79,0.3)'" />
+        <input type="tel" name="whatsapp" placeholder="WhatsApp (opcional)" style="
+          padding:14px 20px;border-radius:100px;border:2px solid rgba(255,213,79,0.3);
+          background:white;font-family:'Nunito',sans-serif;font-size:1rem;color:var(--text-dark);
+          outline:none;transition:border-color 0.2s;
+        " onfocus="this.style.borderColor='#ff8f00'" onblur="this.style.borderColor='rgba(255,213,79,0.3)'" />
+        <button type="submit" class="btn-primary large" style="width:100%;justify-content:center;border:none;cursor:pointer;font-size:1.05rem;">
           Quero entrar na lista
-        </a>
-      </div>
-      <p style="margin-top:20px;color:var(--text-soft);font-size:0.85rem;">
+        </button>
+      </form>
+      <p id="form-success" style="display:none;margin-top:16px;color:#ff8f00;font-weight:700;font-size:1.05rem;">
+        Pronto! Você está na lista. Fique de olho no email.
+      </p>
+      <p style="margin-top:16px;color:var(--text-soft);font-size:0.85rem;">
         Gratuito para entrar na lista · Sem spam · Você avisa quando quiser sair
       </p>
     </div>
