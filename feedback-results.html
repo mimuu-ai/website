@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultados - Feedback Mimuu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #fff9ea;
+      color: #1a1a2e;
+      min-height: 100vh;
+      padding: 0;
+    }
+    .header {
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      padding: 24px;
+      text-align: center;
+    }
+    .header img {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      margin-bottom: 8px;
+    }
+    .header h1 {
+      font-family: 'Baloo 2', cursive;
+      color: white;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    /* Login */
+    .login-box {
+      background: white;
+      border-radius: 16px;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      max-width: 400px;
+      margin: 40px auto;
+    }
+    .login-box h2 {
+      font-family: 'Baloo 2', cursive;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e8e0d0;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .login-box input:focus {
+      border-color: #ff8f00;
+    }
+    .login-box .error {
+      color: #d32f2f;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .btn {
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255,143,0,0.3);
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Dashboard */
+    .dashboard { display: none; }
+    .dashboard.active { display: block; }
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .stat-card .number {
+      font-family: 'Baloo 2', cursive;
+      font-size: 2.2rem;
+      color: #ff8f00;
+      line-height: 1.1;
+    }
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: #3d3d5c;
+      margin-top: 4px;
+    }
+    .stars-display {
+      color: #ffc928;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .section h3 {
+      font-family: 'Baloo 2', cursive;
+      color: #1a1a2e;
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #fff3d6;
+    }
+
+    /* Bar chart */
+    .bar-group { margin-bottom: 14px; }
+    .bar-label {
+      font-size: 0.85rem;
+      color: #3d3d5c;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      background: #f5edd8;
+      border-radius: 8px;
+      height: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: linear-gradient(90deg, #ff8f00, #ffc928);
+      height: 100%;
+      border-radius: 8px;
+      transition: width 0.6s ease;
+      min-width: 2px;
+    }
+    .bar-value {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    /* Comments */
+    .comment {
+      background: #fff9ea;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      border-left: 3px solid #ffc928;
+    }
+    .comment .author {
+      font-size: 0.8rem;
+      color: #3d3d5c;
+      margin-bottom: 4px;
+    }
+    .comment .text {
+      font-size: 0.95rem;
+      color: #1a1a2e;
+      line-height: 1.5;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #3d3d5c;
+    }
+
+    .refresh-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .refresh-bar .count {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      color: #3d3d5c;
+    }
+    .btn-sm {
+      background: white;
+      color: #ff8f00;
+      border: 2px solid #ff8f00;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-sm:hover {
+      background: #ff8f00;
+      color: white;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th {
+      background: #fff3d6;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 700;
+      color: #1a1a2e;
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0e8d8;
+      color: #3d3d5c;
+    }
+    tr:hover td { background: #fffdf5; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="https://raw.githubusercontent.com/mimuu-ai/website/main/mimuu-avatar.jpg" alt="Mimuu">
+    <h1>Resultados do Feedback</h1>
+  </div>
+
+  <div class="container">
+    <!-- Login -->
+    <div class="login-box" id="loginBox">
+      <h2>Acesso restrito</h2>
+      <p style="color:#3d3d5c; margin-bottom:20px; font-size:0.95rem;">Digite a senha para visualizar os resultados.</p>
+      <input type="password" id="passInput" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="error" id="loginError">Senha incorreta</div>
+      <button class="btn" onclick="doLogin()" id="loginBtn">Entrar</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+      <div class="refresh-bar">
+        <span class="count" id="totalCount">0 respostas</span>
+        <button class="btn-sm" onclick="loadData()">Atualizar</button>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="summary-row" id="summaryCards">
+        <div class="stat-card">
+          <div class="number" id="avgUteis">-</div>
+          <div class="stars-display" id="starsUteis"></div>
+          <div class="label">Respostas uteis</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="avgEntende">-</div>
+          <div class="stars-display" id="starsEntende"></div>
+          <div class="label">Entende bem</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="avgRapidez">-</div>
+          <div class="stars-display" id="starsRapidez"></div>
+          <div class="label">Rapidez</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="avgTom">-</div>
+          <div class="stars-display" id="starsTom"></div>
+          <div class="label">Tom agradavel</div>
+        </div>
+      </div>
+
+      <!-- Frequency -->
+      <div class="section" id="secFrequencia">
+        <h3>Com que frequencia usam o Mimuu</h3>
+        <div id="chartFrequencia"></div>
+      </div>
+
+      <!-- Usos -->
+      <div class="section" id="secUsos">
+        <h3>Pra que usam o Mimuu</h3>
+        <div id="chartUsos"></div>
+      </div>
+
+      <!-- Horario -->
+      <div class="section" id="secHorario">
+        <h3>Horario de uso</h3>
+        <div id="chartHorario"></div>
+      </div>
+
+      <!-- Erros -->
+      <div class="section">
+        <h3>Frequencia de erros</h3>
+        <div id="chartErros"></div>
+      </div>
+
+      <!-- Comparacao -->
+      <div class="section">
+        <h3>Comparado a outros assistentes</h3>
+        <div id="chartComparacao"></div>
+      </div>
+
+      <!-- Recomendaria -->
+      <div class="section">
+        <h3>Recomendaria o Mimuu</h3>
+        <div id="chartRecomendaria"></div>
+      </div>
+
+      <!-- Pagaria -->
+      <div class="section">
+        <h3>Pagaria pelo Mimuu</h3>
+        <div id="chartPagaria"></div>
+      </div>
+
+      <!-- Quanto -->
+      <div class="section" id="secQuanto">
+        <h3>Quanto pagaria por mes</h3>
+        <div id="chartQuanto"></div>
+      </div>
+
+      <!-- Comments: mais gostou -->
+      <div class="section">
+        <h3>O que mais gostaram</h3>
+        <div id="commentsGostou"></div>
+      </div>
+
+      <!-- Comments: melhorar -->
+      <div class="section">
+        <h3>O que pode melhorar</h3>
+        <div id="commentsMelhorar"></div>
+      </div>
+
+      <!-- Comments: falta funcionalidade -->
+      <div class="section">
+        <h3>Funcionalidades que faltam</h3>
+        <div id="commentsFalta"></div>
+      </div>
+
+      <!-- Comments: final -->
+      <div class="section">
+        <h3>Comentarios finais</h3>
+        <div id="commentsFinal"></div>
+      </div>
+
+      <!-- Raw table -->
+      <div class="section">
+        <h3>Todas as respostas</h3>
+        <div class="table-wrap" id="rawTable"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://kyrybuwuxbvhzidxvlgd.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5cnlidXd1eGJ2aHppZHh2bGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTc5MjMsImV4cCI6MjA4ODM5MzkyM30.kE5KhGhOlksr_4FfIVAqq_WU3VkKwCwmkLnWyW28cO8';
+    let currentPassword = '';
+    let responses = [];
+
+    async function doLogin() {
+      const pass = document.getElementById('passInput').value;
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+      err.style.display = 'none';
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_feedback`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ pass })
+        });
+
+        if (!res.ok) {
+          throw new Error('wrong password');
+        }
+
+        responses = await res.json();
+        currentPassword = pass;
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        renderDashboard();
+      } catch (e) {
+        err.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_feedback`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ pass: currentPassword })
+        });
+        if (res.ok) {
+          responses = await res.json();
+          renderDashboard();
+        }
+      } catch (e) {}
+    }
+
+    function renderDashboard() {
+      const n = responses.length;
+      document.getElementById('totalCount').textContent = `${n} resposta${n !== 1 ? 's' : ''}`;
+
+      if (n === 0) {
+        document.getElementById('summaryCards').innerHTML = '<div class="empty-state">Nenhuma resposta ainda.</div>';
+        return;
+      }
+
+      // Averages
+      renderAvg('avgUteis', 'starsUteis', 'respostas_uteis');
+      renderAvg('avgEntende', 'starsEntende', 'entende_bem');
+      renderAvg('avgRapidez', 'starsRapidez', 'rapidez');
+      renderAvg('avgTom', 'starsTom', 'tom_agradavel');
+
+      // Bar charts
+      renderBarChart('chartFrequencia', countField('frequencia'));
+      renderBarChart('chartHorario', countField('horario'));
+      renderBarChart('chartErros', countField('frequencia_erros'));
+      renderBarChart('chartComparacao', countField('comparacao'));
+      renderBarChart('chartRecomendaria', countField('recomendaria'));
+      renderBarChart('chartPagaria', countField('pagaria'));
+      renderBarChart('chartQuanto', countField('quanto_por_mes'));
+
+      // Usos (array field)
+      const usosCount = {};
+      responses.forEach(r => {
+        if (r.usos && Array.isArray(r.usos)) {
+          r.usos.forEach(u => { usosCount[u] = (usosCount[u] || 0) + 1; });
+        }
+      });
+      renderBarChart('chartUsos', usosCount);
+
+      // Comments
+      renderComments('commentsGostou', 'mais_gostou');
+      renderComments('commentsMelhorar', 'melhorar');
+      renderComments('commentsFalta', 'falta_funcionalidade');
+      renderComments('commentsFinal', 'comentario_final');
+
+      // Raw table
+      renderTable();
+    }
+
+    function renderAvg(numId, starsId, field) {
+      const vals = responses.map(r => r[field]).filter(v => v != null);
+      if (vals.length === 0) {
+        document.getElementById(numId).textContent = '-';
+        document.getElementById(starsId).textContent = '';
+        return;
+      }
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      document.getElementById(numId).textContent = avg.toFixed(1);
+      const full = Math.round(avg);
+      document.getElementById(starsId).textContent = '\u2605'.repeat(full) + '\u2606'.repeat(5 - full);
+    }
+
+    function countField(field) {
+      const counts = {};
+      responses.forEach(r => {
+        const v = r[field];
+        if (v) counts[v] = (counts[v] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function renderBarChart(containerId, data) {
+      const el = document.getElementById(containerId);
+      const total = Object.values(data).reduce((a, b) => a + b, 0);
+      if (total === 0) {
+        el.innerHTML = '<div class="empty-state" style="padding:12px;">Sem dados</div>';
+        return;
+      }
+      const max = Math.max(...Object.values(data));
+      const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+      el.innerHTML = sorted.map(([label, count]) => {
+        const pct = (count / max) * 100;
+        const pctTotal = ((count / total) * 100).toFixed(0);
+        return `
+          <div class="bar-group">
+            <div class="bar-label">${label}</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%"></div>
+              <div class="bar-value">${count} (${pctTotal}%)</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderComments(containerId, field) {
+      const el = document.getElementById(containerId);
+      const comments = responses.filter(r => r[field] && r[field].trim()).map(r => ({
+        nome: r.nome || 'Anonimo',
+        text: r[field],
+        date: new Date(r.created_at).toLocaleDateString('pt-BR')
+      }));
+      if (comments.length === 0) {
+        el.innerHTML = '<div class="empty-state" style="padding:12px;">Nenhum comentario</div>';
+        return;
+      }
+      el.innerHTML = comments.map(c => `
+        <div class="comment">
+          <div class="author">${c.nome} - ${c.date}</div>
+          <div class="text">${c.text}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderTable() {
+      const el = document.getElementById('rawTable');
+      if (responses.length === 0) {
+        el.innerHTML = '<div class="empty-state">Sem dados</div>';
+        return;
+      }
+      let html = '<table><thead><tr>';
+      html += '<th>Nome</th><th>Data</th><th>Freq.</th><th>Uteis</th><th>Entende</th><th>Rapidez</th><th>Tom</th><th>Recomendaria</th><th>Pagaria</th><th>Quanto</th>';
+      html += '</tr></thead><tbody>';
+      responses.forEach(r => {
+        const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+        html += `<tr>
+          <td>${r.nome || 'Anonimo'}</td>
+          <td>${date}</td>
+          <td>${r.frequencia || '-'}</td>
+          <td>${r.respostas_uteis || '-'}</td>
+          <td>${r.entende_bem || '-'}</td>
+          <td>${r.rapidez || '-'}</td>
+          <td>${r.tom_agradavel || '-'}</td>
+          <td>${r.recomendaria || '-'}</td>
+          <td>${r.pagaria || '-'}</td>
+          <td>${r.quanto_por_mes || '-'}</td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    }
+
+    // Focus password input on load
+    window.addEventListener('load', () => document.getElementById('passInput').focus());
+  </script>
+</body>
+</html>
