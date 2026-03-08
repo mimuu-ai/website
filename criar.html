@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar meu Mimuu</title>
+  <meta name="description" content="Configure seu assistente pessoal Mimuu. Em menos de 2 minutos ele ja vai te conhecer." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:title" content="Criar meu Mimuu" />
+  <meta property="og:description" content="Configure seu assistente pessoal com IA em menos de 2 minutos." />
+  <meta property="og:image" content="https://mimuu.ai/og-image.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #fff9ea;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    :root {
+      --yellow: #ffd54f;
+      --yellow-deep: #ffc928;
+      --orange: #ff8f00;
+      --orange-light: #ffb300;
+      --cream: #fff9ea;
+      --cream-dark: #fff3cc;
+      --text-dark: #1a1a2e;
+      --text-medium: #3d3d5c;
+      --text-light: #6b6b8d;
+      --border: #e8e0c8;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    h1, h2, h3 { font-family: 'Baloo 2', cursive; }
+
+    /* ─── Header ─── */
+    .header {
+      text-align: center;
+      padding: 48px 24px 32px;
+    }
+    .header img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      font-size: 2rem;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 1.05rem;
+      color: var(--text-medium);
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ─── Form Container ─── */
+    .form-container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ─── Section ─── */
+    .section {
+      margin-bottom: 36px;
+    }
+    .section-label {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .section-hint {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    /* ─── Inputs ─── */
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      color: var(--text-dark);
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--orange);
+    }
+    input::placeholder, textarea::placeholder {
+      color: #b0a890;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+    .input-row > * {
+      flex: 1;
+    }
+
+    /* ─── Personality Cards ─── */
+    .personality-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .personality-card {
+      position: relative;
+      padding: 18px 16px;
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .personality-card:hover {
+      border-color: var(--orange-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,143,0,0.1);
+    }
+    .personality-card.selected {
+      border-color: var(--orange);
+      background: linear-gradient(135deg, #fff9ea 0%, #fff3cc 100%);
+      box-shadow: 0 4px 16px rgba(255,143,0,0.15);
+    }
+    .personality-card .icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .personality-card .name {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .personality-card .desc {
+      font-size: 0.8rem;
+      color: var(--text-medium);
+      line-height: 1.3;
+    }
+    .personality-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Interest Chips ─── */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      padding: 8px 18px;
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .chip:hover {
+      border-color: var(--orange-light);
+    }
+    .chip.selected {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ─── Submit Button ─── */
+    .submit-btn {
+      width: 100%;
+      padding: 16px 32px;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      background: linear-gradient(135deg, var(--yellow-deep) 0%, var(--yellow) 100%);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 12px;
+      position: relative;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,201,40,0.4);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .submit-btn.loading {
+      color: transparent;
+    }
+    .submit-btn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      margin: -12px 0 0 -12px;
+      border: 3px solid rgba(26,26,46,0.2);
+      border-top-color: var(--text-dark);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Success Screen ─── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .success-screen.show { display: block; }
+    .success-screen .check {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--yellow-deep), var(--yellow));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 2.5rem;
+    }
+    .success-screen h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+    .success-screen p {
+      font-size: 1.05rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .success-screen .bot-link {
+      display: inline-block;
+      padding: 16px 40px;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--orange);
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .success-screen .bot-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,143,0,0.3);
+    }
+    .success-screen .bot-name {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 100px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 480px) {
+      .header h1 { font-size: 1.6rem; }
+      .personality-grid { grid-template-columns: 1fr; }
+      .input-row { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <img src="/mimuu-avatar.jpg" alt="Mimuu" />
+    <h1>Crie seu Mimuu</h1>
+    <p>Configure seu assistente pessoal. Em menos de 2 minutos ele ja vai te conhecer.</p>
+  </div>
+
+  <!-- Form -->
+  <div class="form-container" id="formWrap">
+    <form id="criarForm" novalidate>
+
+      <!-- Nome e Apelido -->
+      <div class="section">
+        <div class="section-label">Sobre voce</div>
+        <div class="input-row">
+          <div>
+            <input type="text" id="nome" placeholder="Seu nome *" required />
+          </div>
+          <div>
+            <input type="text" id="apelido" placeholder="Apelido (opcional)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Pronomes e Fuso -->
+      <div class="section">
+        <div class="input-row">
+          <div>
+            <select id="pronomes">
+              <option value="ele/dele">ele/dele</option>
+              <option value="ela/dela">ela/dela</option>
+              <option value="eles/deles">eles/deles</option>
+            </select>
+          </div>
+          <div>
+            <select id="timezone">
+              <option value="America/Sao_Paulo">Brasilia (GMT-3)</option>
+              <option value="America/Manaus">Manaus (GMT-4)</option>
+              <option value="America/Cuiaba">Cuiaba (GMT-4)</option>
+              <option value="America/Belem">Belem (GMT-3)</option>
+              <option value="America/Fortaleza">Fortaleza (GMT-3)</option>
+              <option value="America/Recife">Recife (GMT-3)</option>
+              <option value="America/Bahia">Salvador (GMT-3)</option>
+              <option value="America/Rio_Branco">Rio Branco (GMT-5)</option>
+              <option value="America/Porto_Velho">Porto Velho (GMT-4)</option>
+              <option value="America/Noronha">Noronha (GMT-2)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personalidade -->
+      <div class="section">
+        <div class="section-label">Personalidade do seu Mimuu</div>
+        <div class="section-hint">Como voce quer que ele se comunique?</div>
+        <div class="personality-grid">
+          <label class="personality-card" data-value="direto">
+            <input type="radio" name="personalidade" value="direto" />
+            <span class="icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff8f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </span>
+            <span class="name">Direto</span>
+            <span class="desc">Vai reto ao ponto, sem enrolacao</span>
+          </label>
+          <label class="personality-card" data-value="descontraido">
+            <input type="radio" name="personalidade" value="descontraido" />
+            <span class="icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff8f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </span>
+            <span class="name">Descontraido</span>
+            <span class="desc">Leve, faz piada, conversa como amigo</span>
+          </label>
+          <label class="personality-card" data-value="profissional">
+            <input type="radio" name="personalidade" value="profissional" />
+            <span class="icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff8f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </span>
+            <span class="name">Profissional</span>
+            <span class="desc">Formal, organizado, tom corporativo</span>
+          </label>
+          <label class="personality-card" data-value="curioso">
+            <input type="radio" name="personalidade" value="curioso" />
+            <span class="icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff8f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </span>
+            <span class="name">Curioso</span>
+            <span class="desc">Faz perguntas, sugere coisas, puxa assunto</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Interesses -->
+      <div class="section">
+        <div class="section-label">Seus interesses</div>
+        <div class="section-hint">Selecione quantos quiser. Isso ajuda o Mimuu a te conhecer melhor.</div>
+        <div class="chips-container" id="chipsContainer">
+          <span class="chip" data-value="tecnologia">Tecnologia</span>
+          <span class="chip" data-value="esportes">Esportes</span>
+          <span class="chip" data-value="musica">Musica</span>
+          <span class="chip" data-value="filmes-series">Filmes e Series</span>
+          <span class="chip" data-value="jogos">Jogos</span>
+          <span class="chip" data-value="culinaria">Culinaria</span>
+          <span class="chip" data-value="financas">Financas</span>
+          <span class="chip" data-value="fitness">Fitness</span>
+          <span class="chip" data-value="viagens">Viagens</span>
+          <span class="chip" data-value="livros">Livros</span>
+          <span class="chip" data-value="moda">Moda</span>
+          <span class="chip" data-value="noticias">Noticias</span>
+          <span class="chip" data-value="ciencia">Ciencia</span>
+          <span class="chip" data-value="pets">Pets</span>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="section">
+        <div class="section-label">Seu email</div>
+        <div class="section-hint">Vamos enviar o link do seu Mimuu por aqui.</div>
+        <input type="email" id="email" placeholder="seu@email.com" required />
+      </div>
+
+      <!-- Observacoes -->
+      <div class="section">
+        <div class="section-label">Algo mais?</div>
+        <div class="section-hint">Conte o que quiser. Seu Mimuu vai lembrar desde o primeiro dia.</div>
+        <textarea id="observacoes" placeholder="Ex: Trabalho com marketing, acordo cedo, gosto de receber resumos das noticias..."></textarea>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="submit-btn" id="submitBtn">Criar meu Mimuu</button>
+
+    </form>
+  </div>
+
+  <!-- Success Screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="check">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2>Seu Mimuu esta pronto!</h2>
+    <p>Toque no botao abaixo para abrir o Telegram e comecar a conversar com o <span class="bot-name" id="botDisplayName">seu Mimuu</span>.</p>
+    <a href="#" class="bot-link" id="botLink" target="_blank">Abrir no Telegram</a>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ─── Timezone auto-detect ───
+    (function() {
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const sel = document.getElementById('timezone');
+        for (let opt of sel.options) {
+          if (opt.value === tz) {
+            opt.selected = true;
+            break;
+          }
+        }
+      } catch(e) {}
+    })();
+
+    // ─── Personality Cards ───
+    document.querySelectorAll('.personality-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.personality-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        card.querySelector('input[type="radio"]').checked = true;
+      });
+    });
+
+    // ─── Interest Chips ───
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+      });
+    });
+
+    // ─── Toast ───
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ─── Submit ───
+    const API_URL = 'https://mimuu.ai/api/criar'; // TBD
+
+    document.getElementById('criarForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (!nome) { showToast('Preencha seu nome'); return; }
+      if (!email || !email.includes('@')) { showToast('Preencha um email valido'); return; }
+
+      const personalidade = document.querySelector('input[name="personalidade"]:checked');
+      if (!personalidade) { showToast('Escolha uma personalidade pro seu Mimuu'); return; }
+
+      const interesses = Array.from(document.querySelectorAll('.chip.selected')).map(c => c.dataset.value);
+
+      const payload = {
+        nome: nome,
+        apelido: document.getElementById('apelido').value.trim() || nome,
+        pronomes: document.getElementById('pronomes').value,
+        timezone: document.getElementById('timezone').value,
+        personalidade: personalidade.value,
+        interesses: interesses,
+        email: email,
+        observacoes: document.getElementById('observacoes').value.trim()
+      };
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Erro ' + res.status);
+        }
+
+        const data = await res.json();
+
+        // Show success
+        document.getElementById('formWrap').style.display = 'none';
+        document.querySelector('.header').style.display = 'none';
+        const success = document.getElementById('successScreen');
+        success.classList.add('show');
+
+        document.getElementById('botDisplayName').textContent = data.bot_name || 'seu Mimuu';
+        document.getElementById('botLink').href = data.bot_url || '#';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      } catch (err) {
+        console.error('Submit error:', err);
+        showToast('Ops, algo deu errado. Tente novamente!');
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>
