@@ -454,6 +454,13 @@
         <input type="email" id="email" placeholder="seu@email.com" required />
       </div>
 
+      <!-- Nome do Mimuu -->
+      <div class="section">
+        <div class="section-label">Nome do seu Mimuu</div>
+        <div class="section-hint">Se quiser, escolha um nome pro seu assistente. Se deixar em branco, ele vai se chamar Mimuu.</div>
+        <input type="text" id="nomeMimuu" placeholder="Ex: Luna, Theo, Max..." maxlength="20" />
+      </div>
+
       <!-- Observacoes -->
       <div class="section">
         <div class="section-label">Algo mais?</div>
@@ -544,6 +551,7 @@
         personalidade: personalidade.value,
         interesses: interesses,
         email: email,
+        nome_mimuu: document.getElementById('nomeMimuu').value.trim() || '',
         observacoes: document.getElementById('observacoes').value.trim()
       };
 
