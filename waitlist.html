@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mimuu — Lista de Espera</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    background: #fff9ea;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 48px 36px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 4px 24px rgba(255,143,0,0.12);
+    text-align: center;
+  }
+  .logo { font-size: 48px; margin-bottom: 8px; }
+  h1 {
+    background: linear-gradient(135deg, #ffc928, #ff8f00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .subtitle { color: #666; font-size: 15px; margin-bottom: 32px; line-height: 1.5; }
+  input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    margin-bottom: 12px;
+    transition: border 0.2s;
+  }
+  input:focus { outline: none; border-color: #ff8f00; }
+  button {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #ffc928, #ff8f00);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.2s;
+    margin-top: 8px;
+  }
+  button:hover { transform: scale(1.02); }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .success { display: none; }
+  .success.show { display: block; }
+  .success h2 { color: #1a1a2e; font-size: 24px; margin: 16px 0 8px; }
+  .success p { color: #666; font-size: 15px; line-height: 1.5; }
+  .success .emoji { font-size: 56px; }
+  .form-wrap { }
+  .form-wrap.hidden { display: none; }
+  .error { color: #e53935; font-size: 14px; margin-bottom: 12px; display: none; }
+  .hint { color: #999; font-size: 13px; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="form-wrap" id="formWrap">
+    <div class="logo">🤖</div>
+    <h1>Garanta seu Mimuu</h1>
+    <p class="subtitle">Seu assistente pessoal com IA.<br>Deixe seu nome e email — avisamos quando estiver pronto!</p>
+    
+    <div class="error" id="error"></div>
+    
+    <form id="waitlistForm">
+      <input type="text" id="nome" placeholder="Seu nome" required autocomplete="name">
+      <input type="email" id="email" placeholder="Seu melhor email" required autocomplete="email">
+      <button type="submit" id="submitBtn">Quero meu Mimuu!</button>
+    </form>
+    
+    <p class="hint">Vagas limitadas. Sem spam, prometemos 💛</p>
+  </div>
+
+  <div class="success" id="successScreen">
+    <div class="emoji">🎉</div>
+    <h2 id="userName">Você está na lista!</h2>
+    <p>Assim que seu Mimuu estiver pronto, você vai receber um email com tudo pra começar.</p>
+    <p style="margin-top:12px;color:#999;font-size:14px;">Fique de olho na caixa de entrada 💛</p>
+  </div>
+</div>
+
+<script>
+document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const error = document.getElementById('error');
+  error.style.display = 'none';
+  
+  if (!nome || !email) {
+    error.textContent = 'Preencha nome e email';
+    error.style.display = 'block';
+    return;
+  }
+  
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  
+  try {
+    const res = await fetch('https://api.mimuu.ai/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email })
+    });
+    
+    if (!res.ok) throw new Error('Erro ao entrar na lista');
+    
+    document.getElementById('formWrap').classList.add('hidden');
+    document.getElementById('userName').textContent = nome + ', você está na lista!';
+    document.getElementById('successScreen').classList.add('show');
+    
+  } catch (err) {
+    error.textContent = 'Ops, algo deu errado. Tente novamente!';
+    error.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Quero meu Mimuu!';
+  }
+});
+</script>
+
+</body>
+</html>
