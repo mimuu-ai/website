@@ -1323,11 +1323,7 @@
         Entre na lista de espera e seja um dos primeiros a ter seu assistente pessoal com IA.
       </p>
       <!-- Waitlist Form -->
-      <form id="waitlist-form" action="https://formsubmit.co/victor@mimuu.ai" method="POST" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px;">
-        <input type="hidden" name="_subject" value="Nova inscrição na waitlist do Mimuu!" />
-        <input type="hidden" name="_captcha" value="false" />
-        <input type="hidden" name="_next" value="https://mimuu.ai/obrigado" />
-        <input type="hidden" name="_template" value="table" />
+      <form id="waitlist-form" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px;" onsubmit="return submitWaitlist(event)">
         <input type="text" name="name" placeholder="Seu nome" required style="
           padding:14px 20px;border-radius:100px;border:2px solid rgba(255,213,79,0.3);
           background:white;font-family:'Nunito',sans-serif;font-size:1rem;color:var(--text-dark);
@@ -1434,6 +1430,40 @@
 
   // ─── Lucide icons ───
   lucide.createIcons();
+</script>
+<script>
+async function submitWaitlist(e) {
+  e.preventDefault();
+  const form = document.getElementById('waitlist-form');
+  const nome = form.querySelector('input[name="name"]').value.trim();
+  const email = form.querySelector('input[name="email"]').value.trim();
+  const btn = form.querySelector('button[type="submit"]');
+  
+  if (!nome || !email) return false;
+  
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  
+  try {
+    const res = await fetch('https://api.mimuu.ai/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email })
+    });
+    
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    } else {
+      throw new Error('Erro');
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Quero entrar na lista';
+    alert('Ops, algo deu errado. Tente novamente!');
+  }
+  return false;
+}
 </script>
 </body>
 </html>
