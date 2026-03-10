@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre — Mimuu</title>
+  <meta name="description" content="Conheça a Pulso AI, a empresa brasileira por trás do Mimuu — seu assistente pessoal com inteligência artificial." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mimuu.ai/sobre" />
+  <meta property="og:title" content="Sobre — Mimuu" />
+  <meta property="og:description" content="Conheça a Pulso AI, empresa brasileira criadora do Mimuu." />
+  <meta property="og:image" content="https://mimuu.ai/og-image.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #fff9ea;
+      color: #1a1a2e;
+      overflow-x: hidden;
+    }
+    :root {
+      --yellow: #ffd54f;
+      --yellow-deep: #ffc928;
+      --orange: #ff8f00;
+      --orange-light: #ffb300;
+      --cream: #fff9ea;
+      --text-dark: #1a1a2e;
+      --text-mid: #3d3d5c;
+      --text-soft: #6b6b8a;
+      --white: #ffffff;
+      --shadow-sm: 0 2px 12px rgba(255,180,0,0.12);
+      --shadow-md: 0 8px 32px rgba(255,180,0,0.18);
+      --radius: 20px;
+    }
+    h1, h2, h3, h4 { font-family: 'Baloo 2', cursive; }
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .gradient-text {
+      background: linear-gradient(135deg, #ff8f00 0%, #ffc928 60%, #ffd54f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,249,234,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 0 24px;
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 2px 24px rgba(255,180,0,0.12); }
+    .nav-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .nav-logo { text-decoration: none; display: flex; align-items: center; gap: 2px; }
+    .nav-logo-text {
+      font-family: 'Baloo 2', cursive; font-weight: 800; font-size: 1.6rem;
+      color: var(--text-dark);
+    }
+    .nav-logo-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--orange); margin-top: 8px;
+    }
+    .nav-links { list-style: none; display: flex; gap: 32px; }
+    .nav-links a {
+      text-decoration: none; color: var(--text-mid); font-weight: 600;
+      font-size: 0.95rem; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #ff8f00; }
+    .nav-links a.active { color: #ff8f00; }
+    .nav-cta {
+      margin-left: 16px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #ff8f00, #ffb300);
+      color: #fff; padding: 10px 24px; border-radius: 14px;
+      font-weight: 700; font-size: 0.95rem; text-decoration: none;
+      box-shadow: 0 4px 16px rgba(255,143,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,143,0,0.4); }
+    .hamburger { display: none; }
+
+    /* Hero */
+    .page-hero {
+      padding: 140px 0 60px;
+      text-align: center;
+    }
+    .page-hero h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .page-hero .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-mid);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* Sections */
+    .about-section {
+      padding: 60px 0;
+    }
+    .about-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 40px;
+      margin-bottom: 32px;
+    }
+    .about-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      color: var(--text-dark);
+    }
+    .about-card p, .about-card li {
+      font-size: 1rem;
+      color: var(--text-mid);
+      line-height: 1.8;
+    }
+    .about-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .about-card ul li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+    .about-card ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 16px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+    }
+
+    /* Company info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .info-item {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .info-item .label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--orange);
+      margin-bottom: 8px;
+    }
+    .info-item .value {
+      font-size: 1rem;
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    /* Values */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .value-card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+    }
+    .value-card .icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .value-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+    .value-card p {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background: #1a1a2e;
+      color: rgba(255,255,255,0.5);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Baloo 2', cursive; font-weight: 800;
+      font-size: 1.2rem; color: rgba(255,255,255,0.85);
+    }
+    .footer-sep { color: rgba(255,255,255,0.2); margin: 0 8px; }
+    .footer-copy { font-size: 0.85rem; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      color: rgba(255,255,255,0.4); text-decoration: none;
+      font-size: 0.85rem; font-weight: 600; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #ffd54f; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-hero h1 { font-size: 2rem; }
+      .about-card { padding: 28px 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: block; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">Mimuu</span>
+      <span class="nav-logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#features">Funcionalidades</a></li>
+      <li><a href="/#how-it-works">Como funciona</a></li>
+      <li><a href="/sobre" class="active">Sobre</a></li>
+      <li><a href="/#faq">FAQ</a></li>
+    </ul>
+    <a href="/criar" class="btn-primary nav-cta">Quero meu Mimuu</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="page-hero">
+  <div class="container">
+    <h1>Quem faz o <span class="gradient-text">Mimuu</span></h1>
+    <p class="subtitle">
+      Somos uma startup brasileira de inteligencia artificial com uma missao simples: 
+      tornar a IA acessivel para todo mundo, nao so para quem entende de tecnologia.
+    </p>
+  </div>
+</section>
+
+<!-- About sections -->
+<section class="about-section">
+  <div class="container">
+
+    <!-- A Empresa -->
+    <div class="about-card">
+      <h2>A Empresa</h2>
+      <p>
+        A <strong>Pulso AI</strong> nasceu em 2026 com o objetivo de democratizar a inteligencia artificial no Brasil. 
+        Acreditamos que todo brasileiro merece ter acesso a um assistente inteligente que entenda seu idioma, 
+        sua cultura e sua rotina — sem precisar de conhecimento tecnico.
+      </p>
+      <br/>
+      <p>
+        O <strong>Mimuu</strong> e nosso primeiro produto: um assistente pessoal com IA que funciona direto no Telegram. 
+        Ele gerencia sua agenda, escreve textos, pesquisa na internet, cria lembretes e aprende com voce ao longo do tempo. 
+        Cada Mimuu e unico — personalizado para o estilo e as necessidades de quem o usa.
+      </p>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">Empresa</div>
+          <div class="value">Pulso AI Inova Simples (I.S.)</div>
+        </div>
+        <div class="info-item">
+          <div class="label">CNPJ</div>
+          <div class="value">64.739.243/0001-29</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Fundada em</div>
+          <div class="value">Janeiro de 2026</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Sede</div>
+          <div class="value">Osasco, Sao Paulo — Brasil</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Regime</div>
+          <div class="value">Inova Simples (Startup)</div>
+        </div>
+        <div class="info-item">
+          <div class="label">Contato</div>
+          <div class="value">contato@mimuu.ai</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- O Produto -->
+    <div class="about-card">
+      <h2>O Produto</h2>
+      <p>
+        O Mimuu e um assistente pessoal com inteligencia artificial que funciona 100% pelo Telegram. 
+        Diferente de chatbots genericos, cada Mimuu e uma instancia individual — com memoria propria, 
+        personalidade customizada e capacidade de aprender continuamente com seu dono.
+      </p>
+      <br/>
+      <p>O que o Mimuu faz:</p>
+      <ul>
+        <li>Gerencia agenda, lembretes e compromissos</li>
+        <li>Escreve textos, emails e mensagens profissionais</li>
+        <li>Pesquisa qualquer assunto na internet em tempo real</li>
+        <li>Lembra das suas preferencias e rotina</li>
+        <li>Cria imagens, resumos, planilhas e documentos</li>
+        <li>Aprende novas habilidades conforme sua necessidade</li>
+        <li>Integra com email, calendario e Google Drive</li>
+      </ul>
+    </div>
+
+    <!-- Nossos Valores -->
+    <div class="about-card">
+      <h2>Nossos Valores</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="icon">
+            <i data-lucide="heart" style="width:28px;height:28px;color:#fff;stroke-width:2.2;"></i>
+          </div>
+          <h3>Feito para brasileiros</h3>
+          <p>Portugues nativo, referencias culturais brasileiras e suporte local. Nao e uma traducao — e feito daqui.</p>
+        </div>
+        <div class="value-card">
+          <div class="icon">
+            <i data-lucide="shield-check" style="width:28px;height:28px;color:#fff;stroke-width:2.2;"></i>
+          </div>
+          <h3>Privacidade em primeiro lugar</h3>
+          <p>Seus dados sao seus. Cada Mimuu e isolado — suas conversas e memorias nunca sao compartilhadas.</p>
+        </div>
+        <div class="value-card">
+          <div class="icon">
+            <i data-lucide="sparkles" style="width:28px;height:28px;color:#fff;stroke-width:2.2;"></i>
+          </div>
+          <h3>Acessivel para todos</h3>
+          <p>Voce nao precisa entender de IA para usar. Se sabe mandar mensagem no Telegram, sabe usar o Mimuu.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contato -->
+    <div class="about-card" style="text-align: center;">
+      <h2>Fale Conosco</h2>
+      <p>
+        Tem alguma duvida, sugestao ou quer saber mais sobre o Mimuu?<br/>
+        Entre em contato pelo email <a href="mailto:contato@mimuu.ai" style="color: #ff8f00; font-weight: 700; text-decoration: none;">contato@mimuu.ai</a>
+        ou pelo nosso <a href="https://t.me/mimuu_ai" target="_blank" style="color: #ff8f00; font-weight: 700; text-decoration: none;">canal no Telegram</a>.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <span class="footer-logo">Mimuu</span>
+      <span class="footer-sep">&middot;</span>
+      <span class="footer-copy">Pulso AI</span>
+      <span class="footer-sep">&middot;</span>
+      <span class="footer-copy">CNPJ 64.739.243/0001-29</span>
+      <span class="footer-sep">&middot;</span>
+      <span class="footer-copy">2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="/sobre">Sobre</a>
+      <a href="/privacidade">Privacidade</a>
+      <a href="/termos">Termos</a>
+      <a href="https://t.me/mimuu_ai" target="_blank" rel="noopener">Telegram</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  });
+</script>
+
+</body>
+</html>
