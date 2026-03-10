@@ -469,7 +469,7 @@
       </div>
 
       <!-- Submit -->
-      <button type="submit" class="submit-btn" id="submitBtn">Criar meu Mimuu</button>
+      <button type="submit" class="submit-btn" id="submitBtn">Entrar na lista</button>
 
     </form>
   </div>
@@ -479,9 +479,10 @@
     <div class="check">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <h2>Seu Mimuu esta pronto!</h2>
-    <p>Toque no botao abaixo para abrir o Telegram e comecar a conversar com o <span class="bot-name" id="botDisplayName">seu Mimuu</span>.</p>
-    <a href="#" class="bot-link" id="botLink" target="_blank">Abrir no Telegram</a>
+    <h2>Voce esta na lista, <span id="botDisplayName"></span>!</h2>
+    <p>Estamos preparando seu Mimuu com carinho. Assim que estiver pronto, voce recebera um email com o link para comecar a conversar.</p>
+    <p style="margin-top:12px;color:#999;font-size:14px;">Fique de olho na sua caixa de entrada 💛</p>
+    <a href="https://mimuu.ai" class="bot-link" id="botLink">Voltar ao site</a>
   </div>
 
   <!-- Toast -->
@@ -527,7 +528,7 @@
     }
 
     // ─── Submit ───
-    const API_URL = 'https://api.mimuu.ai/api/criar';
+    const API_URL = 'https://api.mimuu.ai/api/waitlist';
 
     document.getElementById('criarForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -573,14 +574,15 @@
 
         const data = await res.json();
 
-        // Show success
+        // Show success (waitlist confirmation)
         document.getElementById('formWrap').style.display = 'none';
         document.querySelector('.header').style.display = 'none';
         const success = document.getElementById('successScreen');
         success.classList.add('show');
 
-        document.getElementById('botDisplayName').textContent = data.bot_name || 'seu Mimuu';
-        document.getElementById('botLink').href = data.bot_url || '#';
+        document.getElementById('botDisplayName').textContent = nome;
+        const botLink = document.getElementById('botLink');
+        botLink.style.display = 'none';
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
