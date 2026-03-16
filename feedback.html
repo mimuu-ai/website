@@ -688,8 +688,13 @@
         return v ? parseInt(v, 10) : null;
       };
 
+      // Capture ref from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref') || null;
+
       const payload = {
         nome: form.nome.value.trim() || null,
+        ref: ref,
         frequencia: getRadioVal('frequencia'),
         usos: usos.length > 0 ? usos : null,
         horario: getRadioVal('horario'),
