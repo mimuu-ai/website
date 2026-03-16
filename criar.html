@@ -568,7 +568,7 @@
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          throw new Error(err.message || 'Erro ' + res.status);
+          throw new Error(err.detail || err.message || 'Erro ' + res.status);
         }
 
         const data = await res.json();
@@ -586,7 +586,7 @@
 
       } catch (err) {
         console.error('Submit error:', err);
-        showToast('Ops, algo deu errado. Tente novamente!');
+        showToast(err.message || 'Ops, algo deu errado. Tente novamente!');
         btn.disabled = false;
         btn.classList.remove('loading');
       }
