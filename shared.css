@@ -246,6 +246,55 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 .status-ok { color: var(--ok); }
 .status-err { color: var(--danger); }
 
+.msg.ai code {
+  background: rgba(0,0,0,0.06);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.msg.ai pre {
+  background: #1e1b18;
+  color: #f0e6d8;
+  padding: 12px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+.msg.ai pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.msg.ai a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.msg.ai strong { font-weight: 700; }
+
+.msg.streaming {
+  min-height: 24px;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: var(--brand);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
 @media (max-width: 980px) {
   .split { grid-template-columns: 1fr; }
   .chat-shell { min-height: calc(100vh - 120px); }
