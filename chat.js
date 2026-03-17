@@ -294,10 +294,33 @@ async function sendMessage() {
   el.input.value = "";
   el.input.style.height = "auto";
 
-  const label = pendingAttachments.length
-    ? `${message || "(sem texto)"}\n\n📎 ${pendingAttachments.map(a => a.name).join(", ")}`
-    : message;
-  addMsg(label, "user");
+  const userBubble = addMsg(message || "", "user");
+  if (pendingAttachments.length) {
+    const attDiv = document.createElement("div");
+    attDiv.className = "msg-attachment";
+    for (const att of pendingAttachments) {
+      if (att.mime.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = `data:${att.mime};base64,${att.data_base64}`;
+        img.alt = att.name;
+        img.title = att.name;
+        img.addEventListener("click", () => window.open(img.src, "_blank"));
+        attDiv.appendChild(img);
+      } else if (att.mime.startsWith("audio/")) {
+        const card = document.createElement("span");
+        card.className = "att-card";
+        card.innerHTML = `<span class="att-icon">🎙️</span> ${att.name}`;
+        attDiv.appendChild(card);
+      } else {
+        const card = document.createElement("span");
+        card.className = "att-card";
+        card.innerHTML = `<span class="att-icon">📄</span> ${att.name}`;
+        attDiv.appendChild(card);
+      }
+    }
+    userBubble.appendChild(attDiv);
+    el.messages.scrollTop = el.messages.scrollHeight;
+  }
 
   const attachmentsToSend = [...pendingAttachments];
   pendingAttachments = [];
