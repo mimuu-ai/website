@@ -20,7 +20,6 @@ const el = {
 let token = "";
 let mimuuName = "";
 let ownerName = "";
-let isStreaming = false;
 
 function persist() {
   localStorage.setItem("mimuu_chat", JSON.stringify({ token, mimuuName, ownerName }));
@@ -50,67 +49,97 @@ function logout() {
   el.loginStatus.textContent = "";
 }
 
-// --- Simple markdown rendering ---
-function renderMarkdown(text) {
-  return text
-    // code blocks
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="lang-$1">$2</code></pre>')
-    // inline code
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // italic
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-    // line breaks
-    .replace(/\n/g, '<br>');
+// --- Thinking phases ---
+const THINKING_PHASES = [
+  { text: "Lendo sua mensagem", icon: "📖", minMs: 800 },
+  { text: "Pensando", icon: "🧠", minMs: 1200 },
+  { text: "Preparando resposta", icon: "✍️", minMs: 1000 },
+  { text: "Escrevendo", icon: "💭", minMs: 0 },
+];
+
+class ThinkingIndicator {
+  constructor(container) {
+    this.container = container;
+    this.el = null;
+    this.textEl = null;
+    this.phase = 0;
+    this.timer = null;
+    this.startTime = 0;
+  }
+
+  start() {
+    this.phase = 0;
+    this.startTime = Date.now();
+    this.el = document.createElement("div");
+    this.el.className = "msg ai thinking-bubble";
+    this.el.innerHTML = `
+      <span class="thinking-icon"></span>
+      <span class="thinking-text"></span>
+      <span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span>
+    `;
+    this.textEl = this.el.querySelector(".thinking-text");
+    this.iconEl = this.el.querySelector(".thinking-icon");
+    this.container.appendChild(this.el);
+    this.container.scrollTop = this.container.scrollHeight;
+    this._show();
+    this._scheduleNext();
+  }
+
+  _show() {
+    const p = THINKING_PHASES[this.phase];
+    this.iconEl.textContent = p.icon;
+    this.textEl.textContent = p.text;
+    this.el.classList.add("visible");
+  }
+
+  _scheduleNext() {
+    if (this.phase >= THINKING_PHASES.length - 1) return;
+    const p = THINKING_PHASES[this.phase];
+    this.timer = setTimeout(() => {
+      this.phase++;
+      this._show();
+      this._scheduleNext();
+    }, p.minMs);
+  }
+
+  stop() {
+    if (this.timer) clearTimeout(this.timer);
+    if (this.el) this.el.remove();
+    this.el = null;
+  }
 }
 
 // --- UI helpers ---
 function addMsg(text, kind = "system") {
   const div = document.createElement("div");
   div.className = `msg ${kind}`;
-  if (kind === "ai") {
-    div.innerHTML = renderMarkdown(text);
-  } else {
-    div.textContent = text;
-  }
+  div.textContent = text;
   el.messages.appendChild(div);
   el.messages.scrollTop = el.messages.scrollHeight;
   return div;
 }
 
-function createStreamingMsg() {
+function createStreamBubble() {
   const div = document.createElement("div");
   div.className = "msg ai streaming";
-  div.innerHTML = '<span class="cursor"></span>';
+  div.innerHTML = '<span class="stream-content"></span><span class="cursor-blink">▌</span>';
   el.messages.appendChild(div);
   el.messages.scrollTop = el.messages.scrollHeight;
-  return div;
-}
-
-function appendToStreamingMsg(div, token) {
-  // Remove cursor, append text, re-add cursor
-  const cursor = div.querySelector(".cursor");
-  if (cursor) cursor.remove();
-  
-  // Append raw text to a data attribute for final markdown render
-  const raw = (div.dataset.raw || "") + token;
-  div.dataset.raw = raw;
-  
-  // Render incrementally
-  div.innerHTML = renderMarkdown(raw) + '<span class="cursor"></span>';
-  el.messages.scrollTop = el.messages.scrollHeight;
-}
-
-function finalizeStreamingMsg(div) {
-  const cursor = div.querySelector(".cursor");
-  if (cursor) cursor.remove();
-  div.classList.remove("streaming");
-  // Final clean render
-  const raw = div.dataset.raw || "";
-  if (raw) div.innerHTML = renderMarkdown(raw);
+  return {
+    el: div,
+    content: div.querySelector(".stream-content"),
+    cursor: div.querySelector(".cursor-blink"),
+    text: "",
+    append(chunk) {
+      this.text += chunk;
+      this.content.textContent = this.text;
+      el.messages.scrollTop = el.messages.scrollHeight;
+    },
+    finish() {
+      this.cursor.remove();
+      this.el.classList.remove("streaming");
+    }
+  };
 }
 
 function openChat() {
@@ -159,17 +188,15 @@ async function login() {
 // --- Chat (streaming) ---
 async function sendMessage() {
   const message = el.input.value.trim();
-  if (!message || !token || isStreaming) return;
+  if (!message || !token) return;
   el.input.value = "";
+  el.input.style.height = "auto";
   addMsg(message, "user");
-  
-  isStreaming = true;
   el.send.disabled = true;
   el.input.disabled = true;
-  el.health.textContent = "pensando...";
-  el.health.className = "small";
 
-  const streamDiv = createStreamingMsg();
+  const thinking = new ThinkingIndicator(el.messages);
+  thinking.start();
 
   try {
     const res = await fetch(`${API_BASE}/api/chat/stream`, {
@@ -182,84 +209,71 @@ async function sendMessage() {
     });
 
     if (!res.ok) {
-      if (res.status === 401) { logout(); return; }
       const err = await res.json().catch(() => ({}));
+      if (res.status === 401) { thinking.stop(); logout(); return; }
       throw new Error(err?.detail || `Erro ${res.status}`);
     }
 
+    // SSE stream
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = "";
+    let bubble = null;
+    let buf = "";
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop() || "";
 
       for (const line of lines) {
         if (!line.startsWith("data: ")) continue;
         try {
           const data = JSON.parse(line.slice(6));
-          if (data.error) {
-            appendToStreamingMsg(streamDiv, `\n⚠️ ${data.error}`);
-            break;
+          if (data.error) throw new Error(data.error);
+
+          if (data.token && !bubble) {
+            thinking.stop();
+            bubble = createStreamBubble();
           }
-          if (data.done) break;
-          if (data.token) {
-            el.health.textContent = "respondendo...";
-            appendToStreamingMsg(streamDiv, data.token);
+
+          if (data.token) bubble.append(data.token);
+
+          if (data.done) {
+            if (bubble) bubble.finish();
+            else {
+              thinking.stop();
+              addMsg("(sem resposta)", "system");
+            }
           }
-        } catch { /* skip malformed */ }
+        } catch (e) {
+          if (e.message !== "Unexpected end of JSON input") {
+            thinking.stop();
+            if (bubble) bubble.finish();
+            addMsg(`Erro: ${e.message}`, "system");
+          }
+        }
       }
     }
 
-    finalizeStreamingMsg(streamDiv);
+    // Handle case where stream ends without [DONE]
+    if (bubble && bubble.el.classList.contains("streaming")) bubble.finish();
+    thinking.stop();
+
     el.health.textContent = "online";
     el.health.className = "small status-ok";
 
   } catch (err) {
-    finalizeStreamingMsg(streamDiv);
-    if (!streamDiv.dataset.raw) {
-      streamDiv.remove();
-    }
+    thinking.stop();
     addMsg(`Falha: ${err.message}`, "system");
     el.health.textContent = "erro";
     el.health.className = "small status-err";
   } finally {
-    isStreaming = false;
     el.send.disabled = false;
     el.input.disabled = false;
     el.input.focus();
-  }
-}
-
-// --- Fallback: non-streaming send (if stream fails) ---
-async function sendMessageFallback() {
-  const message = el.input.value.trim();
-  if (!message || !token) return;
-  el.input.value = "";
-  addMsg(message, "user");
-  el.send.disabled = true;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/chat/send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ message }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.detail || "Erro");
-    addMsg(data.reply || "(sem texto)", "ai");
-  } catch (err) {
-    addMsg(`Falha: ${err.message}`, "system");
-  } finally {
-    el.send.disabled = false;
   }
 }
 
