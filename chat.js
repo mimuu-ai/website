@@ -203,17 +203,79 @@ class ThinkingIndicator {
 }
 
 // --- UI helpers ---
+let currentAudio = null;
+
 function addMsg(text, kind = "system") {
   const div = document.createElement("div");
   div.className = `msg ${kind}`;
   if (kind === "ai") {
     div.innerHTML = renderMarkdown(text);
+    // Add TTS button
+    const ttsBtn = document.createElement("button");
+    ttsBtn.className = "tts-btn";
+    ttsBtn.textContent = "🔊";
+    ttsBtn.title = "Ouvir resposta";
+    ttsBtn.dataset.text = text;
+    ttsBtn.addEventListener("click", () => playTTS(ttsBtn));
+    div.appendChild(ttsBtn);
   } else {
     div.textContent = text;
   }
   el.messages.appendChild(div);
   el.messages.scrollTop = el.messages.scrollHeight;
   return div;
+}
+
+async function playTTS(btn) {
+  // Stop if already playing
+  if (currentAudio && !currentAudio.paused) {
+    currentAudio.pause();
+    currentAudio = null;
+    btn.textContent = "🔊";
+    return;
+  }
+
+  const text = btn.dataset.text;
+  if (!text || !token) return;
+
+  btn.textContent = "⏳";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/chat/tts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text: text.slice(0, 2000) }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.detail || "Erro no TTS");
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    currentAudio.addEventListener("ended", () => {
+      btn.textContent = "🔊";
+      URL.revokeObjectURL(url);
+      currentAudio = null;
+    });
+    currentAudio.addEventListener("error", () => {
+      btn.textContent = "🔊";
+      currentAudio = null;
+    });
+    btn.textContent = "⏹️";
+    await currentAudio.play();
+  } catch (e) {
+    addMsg(`🔊 ${e.message}`, "system");
+    btn.textContent = "🔊";
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function createStreamBubble() {
@@ -235,8 +297,15 @@ function createStreamBubble() {
     finish() {
       this.cursor.remove();
       this.el.classList.remove("streaming");
-      // Re-render with markdown
+      // Re-render with markdown + TTS button
       this.el.innerHTML = renderMarkdown(this.text);
+      const ttsBtn = document.createElement("button");
+      ttsBtn.className = "tts-btn";
+      ttsBtn.textContent = "🔊";
+      ttsBtn.title = "Ouvir resposta";
+      ttsBtn.dataset.text = this.text;
+      ttsBtn.addEventListener("click", () => playTTS(ttsBtn));
+      this.el.appendChild(ttsBtn);
     }
   };
 }
