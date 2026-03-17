@@ -9,7 +9,6 @@ const el = {
   logoutBtn: document.getElementById("logoutBtn"),
   badge: document.getElementById("badge"),
   title: document.getElementById("title"),
-  subtitle: document.getElementById("subtitle"),
   health: document.getElementById("health"),
   messages: document.getElementById("messages"),
   input: document.getElementById("input"),
@@ -71,6 +70,7 @@ function logout() {
   localStorage.removeItem("mimuu_chat");
   el.chatView.style.display = "none";
   el.loginView.style.display = "flex";
+  el.loginStatus.textContent = "";
   el.messages.innerHTML = "";
   el.loginStatus.textContent = "";
 }
@@ -115,7 +115,7 @@ async function addSelectedFiles(fileList) {
 async function toggleRecording() {
   if (mediaRecorder && mediaRecorder.state === "recording") {
     mediaRecorder.stop();
-    el.recBtn.textContent = "🎙️ Áudio";
+    el.recBtn.classList.remove("recording");
     return;
   }
 
@@ -136,7 +136,7 @@ async function toggleRecording() {
       stream.getTracks().forEach(t => t.stop());
     };
     mediaRecorder.start();
-    el.recBtn.textContent = "⏹️ Parar";
+    el.recBtn.classList.add("recording");
   } catch (e) {
     addMsg("Não consegui acessar o microfone.", "system");
   }
@@ -323,7 +323,7 @@ async function loadHistory() {
 function renderHistory(items) {
   el.messages.innerHTML = "";
   if (!items.length) {
-    addMsg("Tudo pronto. Pode mandar mensagem 🙂", "system");
+    addMsg("Comece uma conversa", "system");
     return;
   }
   for (const it of items) {
@@ -334,17 +334,16 @@ function renderHistory(items) {
 
 async function openChat() {
   el.loginView.style.display = "none";
-  el.chatView.style.display = "block";
-  el.title.textContent = mimuuName ? `Chat com ${mimuuName}` : "Seu chat com o Mimuu";
-  el.subtitle.textContent = ownerName ? `Olá, ${ownerName}` : "Conectado";
-  el.health.textContent = "sincronizando";
-  el.health.className = "small";
+  el.chatView.style.display = "flex";
+  el.title.textContent = mimuuName || "Mimuu";
+  el.health.textContent = "sincronizando…";
+  el.health.className = "topbar-status";
 
   const items = await loadHistory().catch(() => []);
   renderHistory(items);
 
   el.health.textContent = "online";
-  el.health.className = "small status-ok";
+  el.health.className = "topbar-status online";
   el.input.focus();
 }
 
@@ -354,8 +353,8 @@ async function login() {
   if (!email) return;
 
   el.loginBtn.disabled = true;
-  el.loginStatus.textContent = "entrando...";
-  el.loginStatus.style.color = "var(--muted)";
+  el.loginStatus.textContent = "entrando…";
+  el.loginStatus.style.color = "";
 
   try {
     const res = await fetch(`${API_BASE}/api/chat/user-login`, {
@@ -374,7 +373,6 @@ async function login() {
     await openChat();
   } catch (err) {
     el.loginStatus.textContent = err.message;
-    el.loginStatus.style.color = "var(--danger)";
   } finally {
     el.loginBtn.disabled = false;
   }
@@ -447,7 +445,7 @@ async function sendMessage() {
         thinking.stop();
         addMsg("😴 Seu Mimuu está dormindo ou em manutenção. Tente de novo em alguns segundos.", "system");
         el.health.textContent = "offline";
-        el.health.className = "small status-err";
+        el.health.className = "topbar-status error";
         return;
       }
       throw new Error(err?.detail || `Erro ${res.status}`);
@@ -502,7 +500,7 @@ async function sendMessage() {
     thinking.stop();
 
     el.health.textContent = "online";
-    el.health.className = "small status-ok";
+    el.health.className = "topbar-status online";
 
   } catch (err) {
     thinking.stop();
@@ -513,7 +511,7 @@ async function sendMessage() {
       : `❌ ${err.message}`;
     addMsg(msg, "system");
     el.health.textContent = "erro";
-    el.health.className = "small status-err";
+    el.health.className = "topbar-status error";
   } finally {
     el.send.disabled = false;
     el.input.disabled = false;
@@ -542,13 +540,16 @@ async function boot() {
 }
 
 // --- Events ---
-el.loginBtn.addEventListener("click", login);
-el.email.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") login();
-});
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => { e.preventDefault(); login(); });
+} else {
+  el.loginBtn.addEventListener("click", login);
+  el.email.addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+}
 el.newChatBtn?.addEventListener("click", () => {
   el.messages.innerHTML = "";
-  addMsg("Nova conversa iniciada 🙂", "system");
+  addMsg("Nova conversa", "system");
   el.input.focus();
 });
 el.logoutBtn.addEventListener("click", logout);
