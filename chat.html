@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mimuu Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./shared.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-dot"></span> Mimuu</div>
+      <span class="badge">CHAT · USER</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card chat-shell">
+      <div class="chat-head">
+        <div class="chat-meta">
+          <h2 id="title">Seu chat com o Mimuu</h2>
+          <p id="subtitle">Conectando...</p>
+        </div>
+        <span id="health" class="small">—</span>
+      </div>
+
+      <div id="messages" class="msg-area"></div>
+
+      <div class="composer">
+        <textarea id="input" placeholder="Escreve aqui... (Enter envia, Shift+Enter quebra linha)"></textarea>
+        <button id="send" class="primary">Enviar</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./chat.js"></script>
+</body>
+</html>

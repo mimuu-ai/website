@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mimuu Dev Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./shared.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-dot"></span> Mimuu</div>
+      <span class="badge">PAINEL · DEV</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="loginCard" class="card panel" style="max-width: 460px; margin: 0 auto;">
+      <h2 style="margin-top: 0">Entrar no painel dev</h2>
+      <p class="small">Acesso restrito para time interno.</p>
+      <div class="form-row">
+        <input id="password" type="password" placeholder="Senha admin" />
+        <button id="login" class="primary">Entrar</button>
+        <p id="loginStatus" class="small"></p>
+      </div>
+    </section>
+
+    <section id="app" class="split" style="display:none;">
+      <aside class="card panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <strong>Mimuus ativos</strong>
+          <button id="refresh" class="ghost" style="padding:8px 10px">Atualizar</button>
+        </div>
+        <p class="small">Selecione um Mimuu para testar.</p>
+        <div id="instanceList" class="list"></div>
+      </aside>
+
+      <section class="card chat-shell">
+        <div class="chat-head">
+          <div class="chat-meta">
+            <h2 id="devTitle">Painel de teste</h2>
+            <p id="devSub">Selecione um Mimuu na esquerda</p>
+          </div>
+          <span id="devHealth" class="small">—</span>
+        </div>
+
+        <div id="devMessages" class="msg-area">
+          <div class="msg system">Modo dev invisível ativo. Sessão isolada do usuário.</div>
+        </div>
+
+        <div class="composer">
+          <textarea id="devInput" placeholder="Mensagem de teste para o Mimuu..."></textarea>
+          <button id="devSend" class="primary">Enviar</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="./dev.js"></script>
+</body>
+</html>
