@@ -142,14 +142,40 @@ function createStreamBubble() {
   };
 }
 
-function openChat() {
+async function loadHistory() {
+  if (!token) return [];
+  const res = await fetch(`${API_BASE}/api/chat/history?limit=80`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items || [];
+}
+
+function renderHistory(items) {
+  el.messages.innerHTML = "";
+  if (!items.length) {
+    addMsg("Tudo pronto. Pode mandar mensagem 🙂", "system");
+    return;
+  }
+  for (const it of items) {
+    addMsg(it.text, it.role === "assistant" ? "ai" : "user");
+  }
+}
+
+async function openChat() {
   el.loginView.style.display = "none";
   el.chatView.style.display = "block";
   el.title.textContent = mimuuName ? `Chat com ${mimuuName}` : "Seu chat com o Mimuu";
   el.subtitle.textContent = ownerName ? `Olá, ${ownerName}` : "Conectado";
+  el.health.textContent = "sincronizando";
+  el.health.className = "small";
+
+  const items = await loadHistory().catch(() => []);
+  renderHistory(items);
+
   el.health.textContent = "online";
   el.health.className = "small status-ok";
-  addMsg("Tudo pronto. Pode mandar mensagem 🙂", "system");
   el.input.focus();
 }
 
@@ -176,7 +202,7 @@ async function login() {
     mimuuName = data.mimuu_name || "";
     ownerName = data.owner_name || "";
     persist();
-    openChat();
+    await openChat();
   } catch (err) {
     el.loginStatus.textContent = err.message;
     el.loginStatus.style.color = "var(--danger)";
@@ -278,19 +304,19 @@ async function sendMessage() {
 }
 
 // --- Boot ---
-function boot() {
+async function boot() {
   const params = new URLSearchParams(window.location.search);
   const urlToken = params.get("token");
   if (urlToken) {
     token = urlToken;
     persist();
     window.history.replaceState({}, "", "/chat");
-    openChat();
+    await openChat();
     return;
   }
 
   if (restore()) {
-    openChat();
+    await openChat();
     return;
   }
 
