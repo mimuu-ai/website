@@ -2,13 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mimuu Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./shared.css" />
   <link rel="icon" href="./favicon.ico" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -41,8 +42,9 @@
           <h2 id="title">Seu chat com o Mimuu</h2>
           <p id="subtitle">Conectado</p>
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
           <span id="health" class="small">—</span>
+          <button id="newChatBtn" class="ghost" style="padding:6px 10px; font-size:12px" title="Nova conversa">🔄 Nova</button>
           <button id="logoutBtn" class="ghost" style="padding:6px 10px; font-size:12px">Sair</button>
         </div>
       </div>
@@ -50,16 +52,16 @@
       <div id="messages" class="msg-area"></div>
 
       <div class="composer">
-        <div>
-          <textarea id="input" placeholder="Escreve aqui... (Enter envia, Shift+Enter quebra linha)"></textarea>
-          <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
+        <div class="composer-left">
+          <textarea id="input" placeholder="Escreve aqui..." rows="1"></textarea>
+          <div class="composer-actions">
             <input id="fileInput" type="file" multiple accept="image/*,audio/*,.pdf,.txt,.md,.csv,.json,.doc,.docx" style="display:none" />
-            <button id="attachBtn" class="ghost" type="button" style="padding:6px 10px; font-size:12px;">📎 Anexar</button>
-            <button id="recBtn" class="ghost" type="button" style="padding:6px 10px; font-size:12px;">🎙️ Áudio</button>
+            <button id="attachBtn" class="ghost composer-btn" type="button" title="Anexar arquivo">📎</button>
+            <button id="recBtn" class="ghost composer-btn" type="button" title="Gravar áudio">🎙️</button>
             <span id="attachCount" class="small"></span>
           </div>
         </div>
-        <button id="send" class="primary">Enviar</button>
+        <button id="send" class="primary composer-send">↑</button>
       </div>
     </section>
   </main>

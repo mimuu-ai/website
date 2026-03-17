@@ -18,7 +18,24 @@ const el = {
   attachBtn: document.getElementById("attachBtn"),
   recBtn: document.getElementById("recBtn"),
   attachCount: document.getElementById("attachCount"),
+  newChatBtn: document.getElementById("newChatBtn"),
 };
+
+// Configure marked for safe rendering
+if (window.marked) {
+  marked.setOptions({ breaks: true, gfm: true });
+}
+
+function renderMarkdown(text) {
+  if (!window.marked || !text) return escapeHtml(text || "");
+  try {
+    return marked.parse(text);
+  } catch { return escapeHtml(text); }
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
 
 // --- State ---
 let token = "";
@@ -189,7 +206,11 @@ class ThinkingIndicator {
 function addMsg(text, kind = "system") {
   const div = document.createElement("div");
   div.className = `msg ${kind}`;
-  div.textContent = text;
+  if (kind === "ai") {
+    div.innerHTML = renderMarkdown(text);
+  } else {
+    div.textContent = text;
+  }
   el.messages.appendChild(div);
   el.messages.scrollTop = el.messages.scrollHeight;
   return div;
@@ -214,6 +235,8 @@ function createStreamBubble() {
     finish() {
       this.cursor.remove();
       this.el.classList.remove("streaming");
+      // Re-render with markdown
+      this.el.innerHTML = renderMarkdown(this.text);
     }
   };
 }
@@ -235,7 +258,8 @@ function renderHistory(items) {
     return;
   }
   for (const it of items) {
-    addMsg(it.text, it.role === "assistant" ? "ai" : "user");
+    const kind = it.role === "assistant" ? "ai" : "user";
+    addMsg(it.text, kind);
   }
 }
 
@@ -436,6 +460,11 @@ el.loginBtn.addEventListener("click", login);
 el.email.addEventListener("keydown", (e) => {
   if (e.key === "Enter") login();
 });
+el.newChatBtn?.addEventListener("click", () => {
+  el.messages.innerHTML = "";
+  addMsg("Nova conversa iniciada 🙂", "system");
+  el.input.focus();
+});
 el.logoutBtn.addEventListener("click", logout);
 el.send.addEventListener("click", sendMessage);
 el.attachBtn?.addEventListener("click", () => el.fileInput?.click());
@@ -449,6 +478,12 @@ el.input.addEventListener("keydown", (e) => {
     e.preventDefault();
     sendMessage();
   }
+});
+
+// Auto-resize textarea
+el.input.addEventListener("input", () => {
+  el.input.style.height = "auto";
+  el.input.style.height = Math.min(el.input.scrollHeight, 160) + "px";
 });
 
 boot();
