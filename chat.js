@@ -369,6 +369,18 @@ async function sendMessage() {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       if (res.status === 401) { thinking.stop(); logout(); return; }
+      if (res.status === 429) {
+        thinking.stop();
+        addMsg("⏳ Muitas mensagens seguidas. Espere uns segundos e tente de novo.", "system");
+        return;
+      }
+      if (res.status === 503) {
+        thinking.stop();
+        addMsg("😴 Seu Mimuu está dormindo ou em manutenção. Tente de novo em alguns segundos.", "system");
+        el.health.textContent = "offline";
+        el.health.className = "small status-err";
+        return;
+      }
       throw new Error(err?.detail || `Erro ${res.status}`);
     }
 
@@ -425,7 +437,12 @@ async function sendMessage() {
 
   } catch (err) {
     thinking.stop();
-    addMsg(`Falha: ${err.message}`, "system");
+    const msg = err.message.includes("Failed to fetch") || err.message.includes("NetworkError")
+      ? "📡 Sem conexão. Verifique sua internet e tente de novo."
+      : err.message.includes("timeout") || err.message.includes("Timeout")
+      ? "⏱️ O Mimuu demorou pra responder. Tente de novo."
+      : `❌ ${err.message}`;
+    addMsg(msg, "system");
     el.health.textContent = "erro";
     el.health.className = "small status-err";
   } finally {
