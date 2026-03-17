@@ -14,12 +14,19 @@ const el = {
   messages: document.getElementById("messages"),
   input: document.getElementById("input"),
   send: document.getElementById("send"),
+  fileInput: document.getElementById("fileInput"),
+  attachBtn: document.getElementById("attachBtn"),
+  recBtn: document.getElementById("recBtn"),
+  attachCount: document.getElementById("attachCount"),
 };
 
 // --- State ---
 let token = "";
 let mimuuName = "";
 let ownerName = "";
+let pendingAttachments = [];
+let mediaRecorder = null;
+let mediaChunks = [];
 
 function persist() {
   localStorage.setItem("mimuu_chat", JSON.stringify({ token, mimuuName, ownerName }));
@@ -42,11 +49,80 @@ function logout() {
   token = "";
   mimuuName = "";
   ownerName = "";
+  pendingAttachments = [];
+  updateAttachmentBadge();
   localStorage.removeItem("mimuu_chat");
   el.chatView.style.display = "none";
   el.loginView.style.display = "flex";
   el.messages.innerHTML = "";
   el.loginStatus.textContent = "";
+}
+
+function updateAttachmentBadge() {
+  if (!pendingAttachments.length) {
+    el.attachCount.textContent = "";
+    return;
+  }
+  const names = pendingAttachments.slice(0, 2).map(a => a.name).join(", ");
+  const more = pendingAttachments.length > 2 ? ` +${pendingAttachments.length - 2}` : "";
+  el.attachCount.textContent = `${pendingAttachments.length} anexo(s): ${names}${more}`;
+}
+
+function fileToAttachment(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const base64 = result.includes(",") ? result.split(",", 2)[1] : "";
+      resolve({
+        name: file.name,
+        mime: file.type || "application/octet-stream",
+        data_base64: base64,
+      });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function addSelectedFiles(fileList) {
+  const files = Array.from(fileList || []).slice(0, 5);
+  for (const f of files) {
+    const att = await fileToAttachment(f);
+    pendingAttachments.push(att);
+  }
+  pendingAttachments = pendingAttachments.slice(0, 5);
+  updateAttachmentBadge();
+}
+
+async function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+    el.recBtn.textContent = "🎙️ Áudio";
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) mediaChunks.push(e.data);
+    };
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(mediaChunks, { type: "audio/webm" });
+      const file = new File([blob], `audio-${Date.now()}.webm`, { type: "audio/webm" });
+      const att = await fileToAttachment(file);
+      pendingAttachments.push(att);
+      pendingAttachments = pendingAttachments.slice(0, 5);
+      updateAttachmentBadge();
+      stream.getTracks().forEach(t => t.stop());
+    };
+    mediaRecorder.start();
+    el.recBtn.textContent = "⏹️ Parar";
+  } catch (e) {
+    addMsg("Não consegui acessar o microfone.", "system");
+  }
 }
 
 // --- Thinking phases ---
@@ -214,10 +290,19 @@ async function login() {
 // --- Chat (streaming) ---
 async function sendMessage() {
   const message = el.input.value.trim();
-  if (!message || !token) return;
+  if ((!message && !pendingAttachments.length) || !token) return;
   el.input.value = "";
   el.input.style.height = "auto";
-  addMsg(message, "user");
+
+  const label = pendingAttachments.length
+    ? `${message || "(sem texto)"}\n\n📎 ${pendingAttachments.map(a => a.name).join(", ")}`
+    : message;
+  addMsg(label, "user");
+
+  const attachmentsToSend = [...pendingAttachments];
+  pendingAttachments = [];
+  updateAttachmentBadge();
+
   el.send.disabled = true;
   el.input.disabled = true;
 
@@ -231,7 +316,7 @@ async function sendMessage() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, attachments: attachmentsToSend }),
     });
 
     if (!res.ok) {
@@ -330,6 +415,12 @@ el.email.addEventListener("keydown", (e) => {
 });
 el.logoutBtn.addEventListener("click", logout);
 el.send.addEventListener("click", sendMessage);
+el.attachBtn?.addEventListener("click", () => el.fileInput?.click());
+el.fileInput?.addEventListener("change", async (e) => {
+  await addSelectedFiles(e.target.files);
+  e.target.value = "";
+});
+el.recBtn?.addEventListener("click", toggleRecording);
 el.input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();

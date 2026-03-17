@@ -50,7 +50,15 @@
       <div id="messages" class="msg-area"></div>
 
       <div class="composer">
-        <textarea id="input" placeholder="Escreve aqui... (Enter envia, Shift+Enter quebra linha)"></textarea>
+        <div>
+          <textarea id="input" placeholder="Escreve aqui... (Enter envia, Shift+Enter quebra linha)"></textarea>
+          <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
+            <input id="fileInput" type="file" multiple accept="image/*,audio/*,.pdf,.txt,.md,.csv,.json,.doc,.docx" style="display:none" />
+            <button id="attachBtn" class="ghost" type="button" style="padding:6px 10px; font-size:12px;">📎 Anexar</button>
+            <button id="recBtn" class="ghost" type="button" style="padding:6px 10px; font-size:12px;">🎙️ Áudio</button>
+            <span id="attachCount" class="small"></span>
+          </div>
+        </div>
         <button id="send" class="primary">Enviar</button>
       </div>
     </section>
