@@ -8,23 +8,43 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./shared.css" />
+  <link rel="icon" href="./favicon.ico" />
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand"><span class="brand-dot"></span> Mimuu</div>
-      <span class="badge">CHAT · USER</span>
+      <a href="/" class="brand" style="text-decoration:none;color:inherit"><span class="brand-dot"></span> Mimuu</a>
+      <span class="badge" id="badge">CHAT</span>
     </div>
   </header>
 
-  <main class="container">
+  <!-- LOGIN -->
+  <main id="loginView" class="container" style="display:flex; align-items:center; justify-content:center; min-height:calc(100vh - 120px);">
+    <section class="card panel" style="max-width:420px; width:100%; text-align:center;">
+      <div style="font-size:42px; margin-bottom:8px;">🧡</div>
+      <h2 style="margin:0 0 4px">Entrar no seu Mimuu</h2>
+      <p class="small" style="margin:0 0 20px">Use o email que cadastrou na criação do seu Mimuu.</p>
+      <div class="form-row">
+        <input id="email" type="email" placeholder="seu@email.com" autocomplete="email" />
+        <button id="loginBtn" class="primary" style="width:100%">Entrar</button>
+        <p id="loginStatus" class="small" style="min-height:18px"></p>
+      </div>
+      <p class="small" style="margin-top:16px">Ainda não tem um Mimuu? <a href="/" style="color:var(--brand)">Saiba mais</a></p>
+    </section>
+  </main>
+
+  <!-- CHAT -->
+  <main id="chatView" class="container" style="display:none;">
     <section class="card chat-shell">
       <div class="chat-head">
         <div class="chat-meta">
           <h2 id="title">Seu chat com o Mimuu</h2>
-          <p id="subtitle">Conectando...</p>
+          <p id="subtitle">Conectado</p>
         </div>
-        <span id="health" class="small">—</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span id="health" class="small">—</span>
+          <button id="logoutBtn" class="ghost" style="padding:6px 10px; font-size:12px">Sair</button>
+        </div>
       </div>
 
       <div id="messages" class="msg-area"></div>
