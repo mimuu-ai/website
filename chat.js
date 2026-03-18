@@ -289,20 +289,32 @@ function createStreamBubble() {
     content: div.querySelector(".stream-content"),
     cursor: div.querySelector(".cursor-blink"),
     text: "",
+    displayed: "",
+    queue: "",
+    _timer: null,
     append(chunk) {
       this.text += chunk;
-      this.content.textContent = this.text;
+      this.queue += chunk;
+      if (!this._timer) this._drain();
+    },
+    _drain() {
+      if (!this.queue.length) { this._timer = null; return; }
+      const batch = this.queue.length > 20 ? 3 : 1;
+      this.displayed += this.queue.slice(0, batch);
+      this.queue = this.queue.slice(batch);
+      this.content.textContent = this.displayed;
       el.messages.scrollTop = el.messages.scrollHeight;
+      this._timer = setTimeout(() => this._drain(), 12);
     },
     finish() {
+      if (this._timer) clearTimeout(this._timer);
       this.cursor.remove();
       this.el.classList.remove("streaming");
-      // Re-render with markdown + TTS button
       this.el.innerHTML = renderMarkdown(this.text);
       const ttsBtn = document.createElement("button");
       ttsBtn.className = "tts-btn";
       ttsBtn.textContent = "🔊";
-      ttsBtn.title = "Ouvir resposta";
+      ttsBtn.title = "Ouvir";
       ttsBtn.dataset.text = this.text;
       ttsBtn.addEventListener("click", () => playTTS(ttsBtn));
       this.el.appendChild(ttsBtn);
