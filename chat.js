@@ -210,14 +210,19 @@ function addMsg(text, kind = "system") {
   div.className = `msg ${kind}`;
   if (kind === "ai") {
     div.innerHTML = renderMarkdown(text);
-    // Add TTS button
+    // TTS button
     const ttsBtn = document.createElement("button");
     ttsBtn.className = "tts-btn";
     ttsBtn.textContent = "🔊";
-    ttsBtn.title = "Ouvir resposta";
+    ttsBtn.title = "Ouvir";
     ttsBtn.dataset.text = text;
     ttsBtn.addEventListener("click", () => playTTS(ttsBtn));
     div.appendChild(ttsBtn);
+  } else if (kind === "user") {
+    const content = document.createElement("div");
+    content.className = "msg-content";
+    content.textContent = text;
+    div.appendChild(content);
   } else {
     div.textContent = text;
   }
@@ -387,6 +392,7 @@ async function sendMessage() {
 
   const userBubble = addMsg(message || "", "user");
   if (pendingAttachments.length) {
+    const contentEl = userBubble.querySelector(".msg-content") || userBubble;
     const attDiv = document.createElement("div");
     attDiv.className = "msg-attachment";
     for (const att of pendingAttachments) {
@@ -400,16 +406,16 @@ async function sendMessage() {
       } else if (att.mime.startsWith("audio/")) {
         const card = document.createElement("span");
         card.className = "att-card";
-        card.innerHTML = `<span class="att-icon">🎙️</span> ${att.name}`;
+        card.innerHTML = `🎙️ ${att.name}`;
         attDiv.appendChild(card);
       } else {
         const card = document.createElement("span");
         card.className = "att-card";
-        card.innerHTML = `<span class="att-icon">📄</span> ${att.name}`;
+        card.innerHTML = `📄 ${att.name}`;
         attDiv.appendChild(card);
       }
     }
-    userBubble.appendChild(attDiv);
+    contentEl.appendChild(attDiv);
     el.messages.scrollTop = el.messages.scrollHeight;
   }
 
