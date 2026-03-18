@@ -765,7 +765,14 @@ function closeSidebar() {
 }
 
 document.getElementById("menuBtn")?.addEventListener("click", openSidebar);
-document.getElementById("sidebarClose")?.addEventListener("click", closeSidebar);
+document.getElementById("sidebarClose")?.addEventListener("click", () => {
+  // On mobile: close overlay. On desktop: collapse sidebar.
+  if (window.innerWidth <= 768) {
+    closeSidebar();
+  } else {
+    sidebar?.classList.toggle("collapsed");
+  }
+});
 sidebarOverlay?.addEventListener("click", closeSidebar);
 
 // New chat from sidebar

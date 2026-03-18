@@ -20,7 +20,10 @@ function initSidebar() {
   if(un) un.textContent=ownerName||"Usuário";
   document.getElementById("logoutSidebar")?.addEventListener("click",logout);
   document.getElementById("menuBtn")?.addEventListener("click",()=>{document.getElementById("sidebar")?.classList.add("open");document.getElementById("sidebarOverlay")?.classList.add("vis");});
-  document.getElementById("sidebarClose")?.addEventListener("click",closeMobile);
+  document.getElementById("sidebarClose")?.addEventListener("click",()=>{
+    if(window.innerWidth<=768)closeMobile();
+    else document.getElementById("sidebar")?.classList.toggle("collapsed");
+  });
   document.getElementById("sidebarOverlay")?.addEventListener("click",closeMobile);
 }
 function closeMobile(){document.getElementById("sidebar")?.classList.remove("open");document.getElementById("sidebarOverlay")?.classList.remove("vis");}

@@ -29,8 +29,9 @@
       flex-direction: column;
       flex-shrink: 0;
       overflow: hidden;
-      transition: width .2s var(--ease), opacity .2s;
+      transition: width .2s var(--ease);
     }
+    .sidebar.collapsed { width: 0; }
 
     .sidebar-header {
       padding: 14px 16px;
