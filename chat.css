@@ -71,9 +71,9 @@ body {
 }
 
 .logo-glyph {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 88px;
+  height: 88px;
+  border-radius: 16px;
   overflow: hidden;
 }
 .logo-glyph img {
