@@ -46,9 +46,11 @@
     .sidebar-footer .user-plan { font-size: 11px; color: #6b6860; }
 
     /* Main content */
-    .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; height: 100vh; height: 100dvh; }
+    .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
 
     /* List view */
+    #listView { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
     .list-header {
       padding: 16px 24px;
       border-bottom: 1px solid var(--border-light);
@@ -85,9 +87,9 @@
     .empty-state h3 { color: var(--text); font-size: 16px; margin-bottom: 6px; }
 
     /* Workspace view */
-    .workspace { display: none; flex: 1; overflow: hidden; }
+    .workspace { display: none; flex: 1; overflow: hidden; min-height: 0; }
     .workspace.active { display: flex; }
-    .ws-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; height: 100%; }
+    .ws-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
     .ws-chat-toolbar {
       padding: 8px 12px; border-bottom: 1px solid var(--border-light);
       display: flex; align-items: center; gap: 6px; flex-shrink: 0;
