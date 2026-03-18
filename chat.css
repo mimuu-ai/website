@@ -140,15 +140,22 @@ body {
   color: #c4421a;
 }
 
-.login-link {
-  display: inline-block;
-  margin-top: 24px;
+.login-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.login-link, #forgotLink {
   font-size: 13px;
   color: var(--text-tertiary);
   text-decoration: none;
+  cursor: pointer;
 }
 
-.login-link:hover { color: var(--brand); }
+.login-link:hover, #forgotLink:hover { color: var(--brand); }
 
 /* ═══ CHAT VIEW ═══ */
 .chat-view {

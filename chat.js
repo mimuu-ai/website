@@ -77,6 +77,10 @@ function logout() {
   el.email.value = "";
   const pw = document.getElementById("password");
   if (pw) { pw.style.display = "none"; pw.value = ""; }
+  const rc = document.getElementById("resetCode");
+  if (rc) { rc.style.display = "none"; rc.value = ""; }
+  const fl = document.getElementById("forgotLink");
+  if (fl) fl.style.display = "none";
   const sub = document.getElementById("loginSub");
   if (sub) sub.textContent = "Entre com o email do seu Mimuu";
   el.loginBtn.textContent = "Continuar";
@@ -368,8 +372,46 @@ async function openChat() {
   el.input.focus();
 }
 
+// --- Forgot password ---
+async function startForgot() {
+  const email = el.email.value.trim();
+  if (!email) return;
+
+  const loginSub = document.getElementById("loginSub");
+  const passwordEl = document.getElementById("password");
+  const resetCodeEl = document.getElementById("resetCode");
+  const forgotLink = document.getElementById("forgotLink");
+
+  el.loginBtn.disabled = true;
+  el.loginStatus.textContent = "Enviando código…";
+  el.loginStatus.style.color = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/chat/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.detail || "Erro ao enviar código");
+
+    loginStep = "forgot-sent";
+    if (loginSub) loginSub.textContent = "Digite o código enviado por email";
+    if (passwordEl) passwordEl.style.display = "none";
+    if (resetCodeEl) { resetCodeEl.style.display = ""; resetCodeEl.focus(); }
+    if (forgotLink) forgotLink.style.display = "none";
+    el.loginBtn.textContent = "Verificar código";
+    el.loginStatus.textContent = "📧 Código enviado!";
+    el.loginStatus.style.color = "#ff8f00";
+  } catch (err) {
+    el.loginStatus.textContent = err.message;
+  } finally {
+    el.loginBtn.disabled = false;
+  }
+}
+
 // --- Login ---
-let loginStep = "email"; // "email" | "password" | "create-password"
+let loginStep = "email"; // "email" | "password" | "create-password" | "forgot-sent" | "reset-password"
 let pendingEmail = "";
 
 async function login() {
@@ -377,6 +419,8 @@ async function login() {
   const passwordEl = document.getElementById("password");
   const password = passwordEl?.value || "";
   const loginSub = document.getElementById("loginSub");
+  const resetCodeEl = document.getElementById("resetCode");
+  const forgotLink = document.getElementById("forgotLink");
 
   if (!email) return;
 
@@ -384,6 +428,46 @@ async function login() {
   el.loginStatus.textContent = "";
 
   try {
+    if (loginStep === "reset-password") {
+      // Setting new password after code verification
+      if (password.length < 4) {
+        el.loginStatus.textContent = "Senha deve ter pelo menos 4 caracteres";
+        return;
+      }
+      const code = resetCodeEl?.value?.trim() || "";
+      const res = await fetch(`${API_BASE}/api/chat/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, new_password: password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || "Erro ao redefinir senha");
+
+      token = data.token;
+      mimuuName = data.mimuu_name || "";
+      ownerName = data.owner_name || "";
+      persist();
+      await openChat();
+      return;
+    }
+
+    if (loginStep === "forgot-sent") {
+      // User entered the code — show new password field
+      const code = resetCodeEl?.value?.trim() || "";
+      if (code.length !== 6) {
+        el.loginStatus.textContent = "Digite o código de 6 dígitos";
+        return;
+      }
+      loginStep = "reset-password";
+      if (loginSub) loginSub.textContent = "Crie sua nova senha";
+      passwordEl.style.display = "";
+      passwordEl.placeholder = "Nova senha";
+      passwordEl.value = "";
+      passwordEl.focus();
+      el.loginBtn.textContent = "Redefinir senha";
+      return;
+    }
+
     if (loginStep === "create-password") {
       // Setting password for the first time
       if (password.length < 4) {
@@ -443,6 +527,7 @@ async function login() {
         passwordEl.focus();
         el.loginBtn.textContent = "Entrar";
         el.email.readOnly = true;
+        if (forgotLink) forgotLink.style.display = "";
         return;
       }
       throw new Error(data?.detail || "Falha no login");
