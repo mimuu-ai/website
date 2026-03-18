@@ -87,7 +87,7 @@
     /* Workspace view */
     .workspace { display: none; flex: 1; }
     .workspace.active { display: flex; }
-    .ws-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .ws-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
     .ws-chat-toolbar {
       padding: 8px 16px; border-bottom: 1px solid var(--border-light);
       display: flex; align-items: center; gap: 8px;
@@ -109,6 +109,7 @@
     .ws-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
     .ws-composer {
       padding: 12px 16px; border-top: 1px solid var(--border-light); display: flex; gap: 8px;
+      flex-shrink: 0;
     }
     .ws-composer textarea {
       flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -287,7 +288,7 @@
         <div class="ws-preview">
           <div class="ws-preview-header"><span id="previewTitle">Preview</span><button class="ws-tool-btn" id="refreshPreview" style="padding:2px 8px">🔄</button></div>
           <div id="noPreview" class="ws-no-preview">Peça ao Mimuu para criar algo!<br>Ex: "Cria um landing page para uma cafeteria"</div>
-          <iframe id="previewFrame" style="display:none" sandbox="allow-scripts"></iframe>
+          <iframe id="previewFrame" style="display:none" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
         </div>
       </div>
     </div>
