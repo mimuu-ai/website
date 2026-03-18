@@ -154,22 +154,7 @@ async function sendMsg() {
     }
   }catch(e){sc.textContent=`❌ ${e.message}`;}
   ai.querySelector(".thinking-dot")?.remove();
-  // Collapse large code blocks for cleaner UX
-  let rendered = md(full||"(sem resposta)");
-  sc.innerHTML = rendered;
-  // Find pre blocks > 200px and collapse them
-  sc.querySelectorAll('pre').forEach(pre => {
-    if(pre.scrollHeight > 250) {
-      pre.style.maxHeight = '120px';
-      pre.style.overflow = 'hidden';
-      pre.style.position = 'relative';
-      const btn = document.createElement('button');
-      btn.textContent = '▼ Ver código completo';
-      btn.style.cssText = 'display:block;width:100%;padding:6px;border:none;background:#2a2a4e;color:#ffc928;font-size:12px;cursor:pointer;border-radius:0 0 8px 8px;margin-top:-4px;';
-      btn.onclick = () => { pre.style.maxHeight='none'; pre.style.overflow='auto'; btn.remove(); };
-      pre.after(btn);
-    }
-  });
+  sc.innerHTML = md(full||"(sem resposta)");
   c.scrollTop=c.scrollHeight; streaming=false;
   setTimeout(()=>{refreshPreview(currentSlug);refreshFiles(currentSlug);},1500);
 }
@@ -292,6 +277,12 @@ document.getElementById("wsSend")?.addEventListener("click",sendMsg);
 document.getElementById("wsInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg();}});
 document.getElementById("wsInput")?.addEventListener("input",function(){this.style.height="auto";this.style.height=Math.min(this.scrollHeight,120)+"px";});
 window.addEventListener("popstate",e=>{if(e.state?.slug)openProject(e.state.slug);else closeProject();});
+
+// Toggle code blocks on click (works for both history and new messages)
+document.getElementById("wsMessages")?.addEventListener("click", e => {
+  const pre = e.target.closest("pre");
+  if(pre) pre.classList.toggle("expanded");
+});
 
 // Init
 if(!loadAuth()){location.href="/chat";}
