@@ -82,7 +82,7 @@ function logout() {
   const fl = document.getElementById("forgotLink");
   if (fl) fl.style.display = "none";
   const sub = document.getElementById("loginSub");
-  if (sub) sub.textContent = "Entre com o email do seu Mimuu";
+  if (sub) sub.textContent = "Entre com seu email ou nome";
   el.loginBtn.textContent = "Continuar";
   el.messages.innerHTML = "";
   el.loginStatus.textContent = "";
@@ -474,10 +474,12 @@ async function login() {
         el.loginStatus.textContent = "Senha deve ter pelo menos 4 caracteres";
         return;
       }
+      const isEmail = email.includes("@");
+      const setBody = isEmail ? { email, password } : { username: email, password };
       const res = await fetch(`${API_BASE}/api/chat/set-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(setBody),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.detail || "Erro ao criar senha");
@@ -490,8 +492,9 @@ async function login() {
       return;
     }
 
-    // Normal login flow
-    const body = { email };
+    // Normal login flow — detect email vs name
+    const isEmail = email.includes("@");
+    const body = isEmail ? { email } : { username: email };
     if (loginStep === "password") body.password = password;
 
     const res = await fetch(`${API_BASE}/api/chat/user-login`, {
