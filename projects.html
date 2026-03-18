@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projetos — Mimuu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .app { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* Projects list view */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .project-card:hover {
+      border-color: var(--brand);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+    .project-card h3 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .project-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .project-card .meta {
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+    .project-card .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 16px;
+    }
+    .project-card:hover .delete-btn { opacity: 0.5; }
+    .project-card .delete-btn:hover { opacity: 1; color: var(--danger); }
+
+    .new-project-card {
+      background: var(--surface-soft);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      transition: all 0.2s;
+      min-height: 120px;
+    }
+    .new-project-card:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      background: rgba(255, 122, 26, 0.04);
+    }
+    .new-project-card .plus { font-size: 28px; font-weight: 300; }
+
+    /* Create dialog */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+    }
+    .modal h2 { margin: 0 0 16px; font-size: 20px; }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal input:focus, .modal textarea:focus { border-color: var(--brand); }
+    .modal textarea { resize: vertical; min-height: 80px; }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: white;
+    }
+    .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+    }
+    .btn-ghost:hover { background: var(--surface-soft); }
+
+    /* Project workspace view */
+    .workspace {
+      display: none;
+      height: calc(100vh - 64px);
+    }
+    .workspace.active { display: flex; }
+    .workspace-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      min-width: 0;
+    }
+    .workspace-preview {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface-soft);
+      min-width: 0;
+    }
+    .preview-header {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .preview-frame {
+      flex: 1;
+      border: none;
+      background: white;
+    }
+    .no-preview {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 40px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* Chat inside workspace */
+    .ws-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .ws-composer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+    .ws-composer textarea {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      max-height: 120px;
+    }
+    .ws-composer textarea:focus { border-color: var(--brand); }
+    .ws-composer .send-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+
+    .msg { margin-bottom: 12px; padding: 10px 14px; border-radius: 14px; max-width: 85%; font-size: 14px; line-height: 1.6; }
+    .msg.user { background: var(--brand); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+    .msg.ai { background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .msg.ai code { background: #1a1a2e; color: #e8e8e8; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    .msg.ai pre { background: #1a1a2e; color: #e8e8e8; padding: 12px; border-radius: 8px; overflow-x: auto; }
+    .msg.ai pre code { background: none; padding: 0; }
+
+    .thinking-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff8f00, #ffc928);
+      box-shadow: 0 0 8px rgba(255,143,0,0.4);
+      animation: bounce 0.8s ease-in-out infinite alternate;
+      display: inline-block;
+    }
+    @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-6px); } }
+
+    /* Back button */
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:hover { background: var(--surface-soft); color: var(--text); }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+    }
+    .page-header h1 { margin: 0; font-size: 22px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state h3 { color: var(--text); margin-bottom: 8px; }
+
+    @media (max-width: 768px) {
+      .workspace { flex-direction: column; }
+      .workspace-chat { border-right: none; border-bottom: 1px solid var(--border); flex: 1; }
+      .workspace-preview { flex: 1; min-height: 300px; }
+      .projects-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <span id="brand-title">Meus Projetos</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a href="/chat" style="color:var(--muted);text-decoration:none;font-size:13px">💬 Chat</a>
+        <button class="btn btn-ghost" id="logout-btn" style="font-size:13px">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Projects List View -->
+  <div id="list-view" class="app">
+    <div class="page-header">
+      <h1>Projetos</h1>
+    </div>
+    <div id="projects-container">
+      <div class="empty-state">
+        <div class="icon">📂</div>
+        <h3>Carregando...</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Workspace View -->
+  <div id="workspace-view" class="workspace">
+    <div class="workspace-chat">
+      <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <button class="back-btn" id="back-btn">← Voltar</button>
+        <span id="project-title" style="font-weight:600;font-size:15px"></span>
+      </div>
+      <div class="ws-messages" id="messages"></div>
+      <div class="ws-composer">
+        <textarea id="input" rows="1" placeholder="Descreva o que quer criar..."></textarea>
+        <button class="send-btn" id="send-btn">↑</button>
+      </div>
+    </div>
+    <div class="workspace-preview">
+      <div class="preview-header">
+        <span>Preview</span>
+        <button class="btn btn-ghost" id="refresh-preview" style="font-size:12px;padding:4px 10px">🔄 Atualizar</button>
+      </div>
+      <div id="no-preview" class="no-preview">
+        Peça ao Mimuu para criar algo!<br>
+        Ex: "Cria um landing page para uma cafeteria"
+      </div>
+      <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts allow-same-origin" style="display:none"></iframe>
+    </div>
+  </div>
+
+  <!-- Create Project Modal -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h2>Novo Projeto</h2>
+      <input type="text" id="project-name" placeholder="Nome do projeto" maxlength="80" autofocus>
+      <textarea id="project-desc" placeholder="Descrição (opcional)"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="cancel-create">Cancelar</button>
+        <button class="btn btn-primary" id="confirm-create">Criar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/projects.js"></script>
+</body>
+</html>
