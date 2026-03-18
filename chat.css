@@ -484,9 +484,8 @@ body {
   height: 28px;
   border-radius: 8px;
   overflow: hidden;
-  animation: mimuu-hop 0.8s cubic-bezier(.36,.07,.19,.97) infinite;
+  animation: mimuu-float 2s ease-in-out infinite;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 6px rgba(255,143,0,.25));
 }
 .thinking-ball img {
   width: 100%;
@@ -494,14 +493,9 @@ body {
   object-fit: contain;
 }
 
-@keyframes mimuu-hop {
-  0%   { transform: translateY(0) scaleX(1) scaleY(1); }
-  15%  { transform: translateY(2px) scaleX(1.1) scaleY(0.85); }
-  30%  { transform: translateY(-14px) scaleX(0.9) scaleY(1.15); }
-  50%  { transform: translateY(0) scaleX(1.05) scaleY(0.92); }
-  65%  { transform: translateY(-5px) scaleX(0.97) scaleY(1.05); }
-  80%  { transform: translateY(0) scaleX(1.02) scaleY(0.98); }
-  100% { transform: translateY(0) scaleX(1) scaleY(1); }
+@keyframes mimuu-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
 }
 
 .thinking-text {
