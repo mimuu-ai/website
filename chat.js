@@ -71,6 +71,15 @@ function logout() {
   el.chatView.style.display = "none";
   el.loginView.style.display = "flex";
   el.loginStatus.textContent = "";
+  loginStep = "email";
+  pendingEmail = "";
+  el.email.readOnly = false;
+  el.email.value = "";
+  const pw = document.getElementById("password");
+  if (pw) { pw.style.display = "none"; pw.value = ""; }
+  const sub = document.getElementById("loginSub");
+  if (sub) sub.textContent = "Entre com o email do seu Mimuu";
+  el.loginBtn.textContent = "Continuar";
   el.messages.innerHTML = "";
   el.loginStatus.textContent = "";
 }
@@ -360,23 +369,84 @@ async function openChat() {
 }
 
 // --- Login ---
+let loginStep = "email"; // "email" | "password" | "create-password"
+let pendingEmail = "";
+
 async function login() {
   const email = el.email.value.trim();
+  const passwordEl = document.getElementById("password");
+  const password = passwordEl?.value || "";
+  const loginSub = document.getElementById("loginSub");
+
   if (!email) return;
 
   el.loginBtn.disabled = true;
-  el.loginStatus.textContent = "entrando…";
-  el.loginStatus.style.color = "";
+  el.loginStatus.textContent = "";
 
   try {
+    if (loginStep === "create-password") {
+      // Setting password for the first time
+      if (password.length < 4) {
+        el.loginStatus.textContent = "Senha deve ter pelo menos 4 caracteres";
+        return;
+      }
+      const res = await fetch(`${API_BASE}/api/chat/set-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || "Erro ao criar senha");
+
+      token = data.token;
+      mimuuName = data.mimuu_name || "";
+      ownerName = data.owner_name || "";
+      persist();
+      await openChat();
+      return;
+    }
+
+    // Normal login flow
+    const body = { email };
+    if (loginStep === "password") body.password = password;
+
     const res = await fetch(`${API_BASE}/api/chat/user-login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify(body),
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data?.detail || "Falha no login");
+
+    if (data.needs_password) {
+      // First time — ask to create password
+      pendingEmail = email;
+      loginStep = "create-password";
+      if (loginSub) loginSub.textContent = `Olá, ${data.owner_name || ""}! Crie uma senha para acessar pelo navegador`;
+      passwordEl.style.display = "";
+      passwordEl.placeholder = "Crie uma senha";
+      passwordEl.autocomplete = "new-password";
+      passwordEl.focus();
+      el.loginBtn.textContent = "Criar senha";
+      el.email.readOnly = true;
+      return;
+    }
+
+    if (!res.ok) {
+      if (res.status === 401 && loginStep === "email") {
+        // Has password, need to enter it
+        loginStep = "password";
+        if (loginSub) loginSub.textContent = "Digite sua senha";
+        passwordEl.style.display = "";
+        passwordEl.placeholder = "Senha";
+        passwordEl.autocomplete = "current-password";
+        passwordEl.focus();
+        el.loginBtn.textContent = "Entrar";
+        el.email.readOnly = true;
+        return;
+      }
+      throw new Error(data?.detail || "Falha no login");
+    }
 
     token = data.token;
     mimuuName = data.mimuu_name || "";
