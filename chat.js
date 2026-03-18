@@ -715,6 +715,7 @@ if (loginForm) {
   el.loginBtn.addEventListener("click", login);
   el.email.addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
 }
+document.getElementById("forgotLink")?.addEventListener("click", (e) => { e.preventDefault(); startForgot(); });
 el.newChatBtn?.addEventListener("click", () => {
   el.messages.innerHTML = "";
   addMsg("Nova conversa", "system");
