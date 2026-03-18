@@ -225,21 +225,29 @@ async function saveContext() {
 
 // Preview
 function sandboxHtml(html) {
-  // Inject script that intercepts ALL link clicks and prevents navigation
-  // Also intercepts form submits. Everything stays inside the preview.
+  // Inject script that handles link clicks inside the preview iframe.
+  // Anchor links (#) scroll internally. External links open in new tab.
+  // Form submits are blocked.
   const script = `<script>
 document.addEventListener('click', function(e) {
   var a = e.target.closest('a');
   if (a) {
-    e.preventDefault();
-    e.stopPropagation();
-    // If it's an anchor link (#section), scroll to it
     var href = a.getAttribute('href') || '';
+    // Anchor links — scroll internally
     if (href.startsWith('#')) {
+      e.preventDefault();
       var target = document.querySelector(href);
       if (target) target.scrollIntoView({behavior:'smooth'});
+      return;
     }
-    // Otherwise do nothing — no external navigation
+    // External links (http, https, wa.me, tel:, mailto:) — open in new tab
+    if (href.startsWith('http') || href.startsWith('//') || href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('whatsapp:')) {
+      e.preventDefault();
+      window.open(href, '_blank', 'noopener');
+      return;
+    }
+    // Anything else — block
+    e.preventDefault();
   }
 }, true);
 document.addEventListener('submit', function(e) { e.preventDefault(); }, true);
