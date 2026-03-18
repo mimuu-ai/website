@@ -109,8 +109,9 @@
 
     .ws-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
     .ws-composer {
-      padding: 10px 12px; border-top: 1px solid var(--border-light); display: flex; gap: 8px;
-      flex-shrink: 0; background: var(--bg);
+      padding: 10px 12px; padding-bottom: max(10px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border-light); display: flex; gap: 8px;
+      flex-shrink: 0; background: var(--bg); z-index: 5;
     }
     .ws-composer textarea {
       flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
