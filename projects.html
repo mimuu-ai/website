@@ -146,7 +146,7 @@
     .ws-msg.ai pre::after { content: '▼ Ver código'; display: block; position: absolute; bottom: 0; left: 0; right: 0; padding: 6px; background: linear-gradient(transparent, #1a1a2e 60%); color: #ffc928; font-size: 11px; text-align: center; pointer-events: none; }
     .ws-msg.ai pre.expanded::after { display: none; }
     .ws-msg.ai pre code { background: none; padding: 0; color: inherit; }
-    .ws-msg { overflow: hidden; word-break: break-word; }
+    .ws-msg { overflow: hidden; word-break: break-word; flex-shrink: 0; }
 
     .thinking-dot {
       width: 14px; height: 14px; border-radius: 50%;
