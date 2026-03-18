@@ -144,10 +144,9 @@ async function toggleRecording() {
 
 // --- Thinking phases ---
 const THINKING_PHASES = [
-  { text: "Lendo sua mensagem", icon: "📖", minMs: 800 },
-  { text: "Pensando", icon: "🧠", minMs: 1200 },
-  { text: "Preparando resposta", icon: "✍️", minMs: 1000 },
-  { text: "Escrevendo", icon: "💭", minMs: 0 },
+  { text: "Lendo", minMs: 800 },
+  { text: "Pensando", minMs: 1500 },
+  { text: "Escrevendo", minMs: 0 },
 ];
 
 class ThinkingIndicator {
@@ -166,12 +165,10 @@ class ThinkingIndicator {
     this.el = document.createElement("div");
     this.el.className = "msg ai thinking-bubble";
     this.el.innerHTML = `
-      <span class="thinking-icon"></span>
+      <span class="thinking-ball"></span>
       <span class="thinking-text"></span>
-      <span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span>
     `;
     this.textEl = this.el.querySelector(".thinking-text");
-    this.iconEl = this.el.querySelector(".thinking-icon");
     this.container.appendChild(this.el);
     this.container.scrollTop = this.container.scrollHeight;
     this._show();
@@ -180,9 +177,7 @@ class ThinkingIndicator {
 
   _show() {
     const p = THINKING_PHASES[this.phase];
-    this.iconEl.textContent = p.icon;
-    this.textEl.textContent = p.text;
-    this.el.classList.add("visible");
+    this.textEl.textContent = p.text + "…";
   }
 
   _scheduleNext() {

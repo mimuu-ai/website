@@ -455,7 +455,7 @@ body {
 .thinking-bubble {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 0 !important;
   background: none !important;
   border: none !important;
@@ -463,18 +463,27 @@ body {
   color: var(--text-tertiary);
 }
 
-.thinking-icon { font-size: 15px; animation: pulse 1.8s ease infinite; }
-
-.thinking-dots span {
-  animation: dotFade 1.4s infinite;
-  opacity: 0;
-  font-weight: 600;
+.thinking-ball {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--brand), var(--brand-deep));
+  box-shadow: 0 2px 8px rgba(255,143,0,.3);
+  animation: bounce 1s ease infinite;
+  flex-shrink: 0;
 }
-.thinking-dots span:nth-child(2) { animation-delay: .2s; }
-.thinking-dots span:nth-child(3) { animation-delay: .4s; }
 
-@keyframes dotFade { 0%, 60%, 100% { opacity: 0; } 30% { opacity: 1; } }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-10px) scale(1.05); }
+  50% { transform: translateY(0) scale(.95); }
+  70% { transform: translateY(-4px) scale(1.02); }
+}
+
+.thinking-text {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
 
 /* ─── Attachments ─── */
 .msg-attachment {
