@@ -1,445 +1,254 @@
 const API_BASE = "https://api.mimuu.ai";
+let token = "", ownerName = "", currentSlug = null, currentProject = null, streaming = false;
 
-let token = "";
-let currentSlug = null;
-let streaming = false;
-let currentProject = null;
-
-// Configure marked
 if (window.marked) marked.setOptions({ breaks: true, gfm: true });
-function renderMd(text) {
-  if (!window.marked || !text) return escHtml(text || "");
-  try { return marked.parse(text); } catch { return escHtml(text); }
-}
+function md(t) { try { return marked.parse(t||""); } catch { return esc(t); } }
+function esc(s) { const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
 
-// --- Auth ---
+// Auth
 function loadAuth() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("mimuu_chat") || "{}");
-    if (saved.token) { token = saved.token; return true; }
-  } catch {}
-  return false;
+  try { const s=JSON.parse(localStorage.getItem("mimuu_chat")||"{}"); if(s.token){token=s.token;ownerName=s.ownerName||"";return true;} } catch{} return false;
 }
-function logout() {
-  localStorage.removeItem("mimuu_chat");
-  window.location.href = "/chat";
-}
-function authHeaders() { return { Authorization: `Bearer ${token}` }; }
+function logout() { localStorage.removeItem("mimuu_chat"); location.href="/chat"; }
+function hdr() { return {Authorization:`Bearer ${token}`}; }
+function hdrJson() { return {...hdr(),"Content-Type":"application/json"}; }
 
-// --- Projects List ---
+// Sidebar
+function initSidebar() {
+  const av=document.getElementById("userAvatar"), un=document.getElementById("userName");
+  if(av&&ownerName) av.textContent=ownerName[0].toUpperCase();
+  if(un) un.textContent=ownerName||"Usuário";
+  document.getElementById("logoutSidebar")?.addEventListener("click",logout);
+  document.getElementById("menuBtn")?.addEventListener("click",()=>{document.getElementById("sidebar")?.classList.add("open");document.getElementById("sidebarOverlay")?.classList.add("vis");});
+  document.getElementById("sidebarClose")?.addEventListener("click",closeMobile);
+  document.getElementById("sidebarOverlay")?.addEventListener("click",closeMobile);
+}
+function closeMobile(){document.getElementById("sidebar")?.classList.remove("open");document.getElementById("sidebarOverlay")?.classList.remove("vis");}
+
+async function loadSidebarProjects(projects) {
+  const c=document.getElementById("sidebarProjects"); if(!c) return;
+  if(!projects||!projects.length){c.innerHTML='<div style="padding:8px 10px;font-size:12px;color:#6b6860">Nenhum projeto</div>';return;}
+  c.innerHTML=projects.map(p=>`<div class="project-sidebar-item ${currentSlug===p.slug?'active':''}" onclick="openProject('${p.slug}')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span>
+  </div>`).join("");
+}
+
+// Projects list
+let allProjects=[];
 async function loadProjects() {
-  const container = document.getElementById("projects-container");
   try {
-    const res = await fetch(`${API_BASE}/api/projects`, { headers: authHeaders() });
-    if (res.status === 401) { logout(); return; }
-    const projects = await res.json();
-    renderProjectsList(projects);
-  } catch (e) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Erro ao carregar</h3><p>${e.message}</p></div>`;
+    const r=await fetch(`${API_BASE}/api/projects`,{headers:hdr()});
+    if(r.status===401){logout();return;}
+    allProjects=await r.json();
+    renderGrid(allProjects);
+    loadSidebarProjects(allProjects);
+  } catch(e) {
+    document.getElementById("projectsGrid").innerHTML=`<div class="empty-state"><h3>Erro</h3><p>${e.message}</p></div>`;
   }
 }
 
-function renderProjectsList(projects) {
-  const container = document.getElementById("projects-container");
-  let html = '<div class="projects-grid">';
-  html += `<div class="new-project-card" onclick="showCreateModal()"><span class="plus">+</span> Novo Projeto</div>`;
-  for (const p of projects) {
-    const date = new Date(p.updated_at || p.created_at).toLocaleDateString("pt-BR");
-    const desc = (p.description || "Sem descrição").slice(0, 100);
-    html += `
-      <div class="project-card" onclick="openProject('${p.slug}')">
-        <button class="delete-btn" onclick="event.stopPropagation(); deleteProject('${p.slug}', '${p.name.replace(/'/g, "\\'")}')">✕</button>
-        <h3>${escHtml(p.name)}</h3>
-        <p>${escHtml(desc)}</p>
-        <div class="meta">Atualizado em ${date}</div>
-      </div>`;
-  }
-  if (!projects.length) {
-    html += `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><p>Nenhum projeto ainda. Crie o primeiro! 🚀</p></div>`;
-  }
-  html += '</div>';
-  container.innerHTML = html;
+function renderGrid(list) {
+  const g=document.getElementById("projectsGrid");
+  if(!list.length){g.innerHTML='<div class="empty-state"><h3>Nenhum projeto</h3><p>Crie o primeiro projeto clicando em "Novo"</p></div>';return;}
+  g.innerHTML=list.map(p=>{
+    const d=new Date(p.updated_at||p.created_at).toLocaleDateString("pt-BR");
+    return `<div class="project-card" onclick="openProject('${p.slug}')">
+      <button class="del-btn" onclick="event.stopPropagation();delProject('${p.slug}','${p.name.replace(/'/g,"\\'")}')">✕</button>
+      <h3>${esc(p.name)}</h3><p>${esc((p.description||"Sem descrição").slice(0,100))}</p>
+      <div class="meta">Atualizado em ${d}</div>
+    </div>`;
+  }).join("");
 }
 
-// --- Create/Delete ---
-function showCreateModal() {
-  document.getElementById("create-modal").classList.add("active");
-  document.getElementById("project-name").focus();
-}
-function hideCreateModal() {
-  document.getElementById("create-modal").classList.remove("active");
-  document.getElementById("project-name").value = "";
-  document.getElementById("project-desc").value = "";
+// Create / Delete
+function showCreate(){document.getElementById("createModal").classList.add("active");document.getElementById("projectName").focus();}
+function hideCreate(){document.getElementById("createModal").classList.remove("active");document.getElementById("projectName").value="";document.getElementById("projectDesc").value="";}
+
+async function doCreate() {
+  const name=document.getElementById("projectName").value.trim(), desc=document.getElementById("projectDesc").value.trim();
+  if(!name)return;
+  const btn=document.getElementById("confirmCreate"); btn.disabled=true; btn.textContent="Criando...";
+  try{
+    const r=await fetch(`${API_BASE}/api/projects`,{method:"POST",headers:hdrJson(),body:JSON.stringify({name,description:desc})});
+    if(!r.ok){alert((await r.json()).detail||"Erro");return;}
+    hideCreate(); openProject((await r.json()).slug);
+  }catch(e){alert(e.message);}
+  finally{btn.disabled=false;btn.textContent="Criar";}
 }
 
-async function createProject() {
-  const name = document.getElementById("project-name").value.trim();
-  const description = document.getElementById("project-desc").value.trim();
-  if (!name) return;
-  const btn = document.getElementById("confirm-create");
-  btn.disabled = true; btn.textContent = "Criando...";
-  try {
-    const res = await fetch(`${API_BASE}/api/projects`, {
-      method: "POST", headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description }),
-    });
-    if (!res.ok) { const err = await res.json(); alert(err.detail || "Erro"); return; }
-    const project = await res.json();
-    hideCreateModal();
-    openProject(project.slug);
-  } catch (e) { alert("Erro: " + e.message); }
-  finally { btn.disabled = false; btn.textContent = "Criar"; }
+async function delProject(slug,name) {
+  if(!confirm(`Deletar "${name}"?`))return;
+  try{await fetch(`${API_BASE}/api/projects/${slug}`,{method:"DELETE",headers:hdr()});loadProjects();}catch(e){alert(e.message);}
 }
 
-async function deleteProject(slug, name) {
-  if (!confirm(`Deletar "${name}"? Todos os arquivos serão removidos.`)) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${slug}`, { method: "DELETE", headers: authHeaders() });
-    if (res.ok) loadProjects(); else alert("Erro ao deletar");
-  } catch (e) { alert("Erro: " + e.message); }
-}
-
-// --- Open Project ---
+// Open / Close project
 async function openProject(slug) {
-  currentSlug = slug;
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${slug}`, { headers: authHeaders() });
-    if (!res.ok) { alert("Projeto não encontrado"); return; }
-    currentProject = await res.json();
-    document.getElementById("project-title").textContent = currentProject.name;
-    document.getElementById("brand-title").textContent = currentProject.name;
-  } catch (e) { alert("Erro: " + e.message); return; }
-
-  document.getElementById("list-view").style.display = "none";
-  document.getElementById("workspace-view").classList.add("active");
-
-  await Promise.all([
-    loadProjectHistory(slug),
-    refreshFileList(slug),
-    refreshPreview(slug),
-  ]);
-
-  history.pushState({ slug }, "", `?project=${slug}`);
+  currentSlug=slug; closeMobile();
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${slug}`,{headers:hdr()});
+    if(!r.ok){alert("Não encontrado");return;}
+    currentProject=await r.json();
+    document.getElementById("wsTitle").textContent=currentProject.name;
+  }catch(e){alert(e.message);return;}
+  document.getElementById("listView").style.display="none";
+  document.getElementById("workspaceView").classList.add("active");
+  loadSidebarProjects(allProjects);
+  await Promise.all([loadHistory(slug),refreshFiles(slug),refreshPreview(slug)]);
+  history.pushState({slug},"",`?project=${slug}`);
 }
 
 function closeProject() {
-  currentSlug = null;
-  currentProject = null;
-  document.getElementById("list-view").style.display = "";
-  document.getElementById("workspace-view").classList.remove("active");
-  document.getElementById("messages").innerHTML = "";
-  document.getElementById("brand-title").textContent = "Meus Projetos";
-  document.getElementById("preview-frame").style.display = "none";
-  document.getElementById("no-preview").style.display = "";
-  document.getElementById("file-panel").classList.remove("active");
-  history.pushState({}, "", "/projects");
+  currentSlug=null; currentProject=null;
+  document.getElementById("listView").style.display="";
+  document.getElementById("workspaceView").classList.remove("active");
+  document.getElementById("wsMessages").innerHTML="";
+  document.getElementById("fileDrawer").classList.remove("open");
+  document.getElementById("previewFrame").style.display="none";
+  document.getElementById("noPreview").style.display="";
+  history.pushState({},"","/projects");
   loadProjects();
 }
 
-// --- File Panel ---
-async function refreshFileList(slug) {
-  if (!slug) return;
-  const list = document.getElementById("file-list");
-  list.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px">Carregando...</div>';
-
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${slug}`, { headers: authHeaders() });
-    if (!res.ok) return;
-    const data = await res.json();
-    const files = data.files || [];
-
-    if (!files.length) {
-      list.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px">Nenhum arquivo ainda</div>';
-      return;
+// History
+async function loadHistory(slug) {
+  const c=document.getElementById("wsMessages"); c.innerHTML="";
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${slug}/history?limit=50`,{headers:hdr()});
+    if(!r.ok)return;
+    for(const m of await r.json()){
+      const d=document.createElement("div");
+      d.className=`ws-msg ${m.role==="user"?"user":"ai"}`;
+      if(m.role==="user"){d.innerHTML=`<span>${esc(m.content)}</span>`;}else{d.innerHTML=md(m.content||"");}
+      c.appendChild(d);
     }
-
-    list.innerHTML = files.map(f => {
-      const icon = f.endsWith('.html') ? '🌐' : f.endsWith('.css') ? '🎨' : f.endsWith('.js') ? '⚡' : f.endsWith('.md') ? '📝' : '📄';
-      const isArtifact = f === 'artifact.html';
-      return `<div class="file-item ${isArtifact ? 'artifact' : ''}" onclick="viewFile('${escAttr(f)}')" title="${escHtml(f)}">
-        <span>${icon}</span>
-        <span class="file-name">${escHtml(f)}</span>
-      </div>`;
-    }).join('');
-  } catch {}
+    c.scrollTop=c.scrollHeight;
+  }catch{}
 }
 
-async function viewFile(filePath) {
-  if (!currentSlug) return;
+// Stream chat
+async function sendMsg() {
+  const inp=document.getElementById("wsInput"), msg=inp.value.trim();
+  if(!msg||streaming||!currentSlug)return;
+  inp.value=""; inp.style.height="auto"; streaming=true;
+  const c=document.getElementById("wsMessages");
+  const u=document.createElement("div"); u.className="ws-msg user"; u.innerHTML=`<span>${esc(msg)}</span>`; c.appendChild(u);
+  const ai=document.createElement("div"); ai.className="ws-msg ai"; ai.innerHTML='<span class="sc"></span><span class="thinking-dot"></span>'; c.appendChild(ai); c.scrollTop=c.scrollHeight;
+  const sc=ai.querySelector(".sc"); let full="";
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/chat/stream`,{method:"POST",headers:hdrJson(),body:JSON.stringify({message:msg})});
+    if(!r.ok){sc.textContent=`❌ ${(await r.json().catch(()=>({}))).detail||"Erro"}`;ai.querySelector(".thinking-dot")?.remove();streaming=false;return;}
+    const rd=r.body.getReader(), dec=new TextDecoder(); let buf="";
+    while(true){
+      const{done,value}=await rd.read(); if(done)break;
+      buf+=dec.decode(value,{stream:true}); const lines=buf.split("\n"); buf=lines.pop()||"";
+      for(const l of lines){if(!l.startsWith("data:"))continue;const p=l.slice(5).trim();if(p==="[DONE]")break;try{const d=JSON.parse(p);if(d.token){full+=d.token;sc.textContent=full;c.scrollTop=c.scrollHeight;}if(d.done)break;}catch{}}
+    }
+  }catch(e){sc.textContent=`❌ ${e.message}`;}
+  ai.querySelector(".thinking-dot")?.remove();
+  sc.innerHTML=md(full||"(sem resposta)");
+  c.scrollTop=c.scrollHeight; streaming=false;
+  setTimeout(()=>{refreshPreview(currentSlug);refreshFiles(currentSlug);},1500);
+}
 
-  // If it's an HTML file, show in preview
-  if (filePath.endsWith('.html')) {
-    try {
-      const res = await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${filePath}`, { headers: authHeaders() });
-      if (res.ok) {
-        const html = await res.text();
-        const frame = document.getElementById("preview-frame");
-        frame.srcdoc = html;
-        frame.style.display = "";
-        document.getElementById("no-preview").style.display = "none";
-        document.getElementById("preview-title").textContent = filePath;
-      }
-    } catch {}
+// Files
+async function refreshFiles(slug) {
+  if(!slug)return;
+  const c=document.getElementById("fileList"); c.innerHTML="";
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${slug}`,{headers:hdr()});if(!r.ok)return;
+    const d=await r.json(), files=d.files||[];
+    if(!files.length){c.innerHTML='<div style="padding:8px 12px;font-size:12px;color:var(--text-placeholder)">Nenhum arquivo</div>';return;}
+    c.innerHTML=files.map(f=>{
+      const ic=f.endsWith('.html')?'🌐':f.endsWith('.css')?'🎨':f.endsWith('.js')?'⚡':f.endsWith('.md')?'📝':'📄';
+      return `<div class="fd-item ${f==='artifact.html'?'artifact':''}" onclick="viewFile('${f.replace(/'/g,"\\'")}')">${ic} <span style="overflow:hidden;text-overflow:ellipsis">${esc(f)}</span></div>`;
+    }).join("");
+  }catch{}
+}
+
+async function viewFile(path) {
+  if(!currentSlug)return;
+  if(path.endsWith('.html')){
+    try{const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${path}`,{headers:hdr()});if(r.ok){const h=await r.text();document.getElementById("previewFrame").srcdoc=h;document.getElementById("previewFrame").style.display="";document.getElementById("noPreview").style.display="none";document.getElementById("previewTitle").textContent=path;}}catch{}
     return;
   }
-
-  // For other files, show in a code viewer overlay
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${filePath}`, { headers: authHeaders() });
-    if (!res.ok) { alert("Arquivo não encontrado"); return; }
-    const content = await res.text();
-    showFileViewer(filePath, content);
-  } catch (e) { alert("Erro: " + e.message); }
-}
-
-function showFileViewer(name, content) {
-  const modal = document.getElementById("file-viewer-modal");
-  document.getElementById("file-viewer-name").textContent = name;
-  const editor = document.getElementById("file-viewer-content");
-  editor.value = content;
-  editor.readOnly = !name.endsWith('.md') && !name.endsWith('.txt') && !name.endsWith('.css') && !name.endsWith('.js') && !name.endsWith('.json');
-  document.getElementById("file-save-btn").style.display = editor.readOnly ? "none" : "";
-  document.getElementById("file-save-btn").dataset.path = name;
-  modal.classList.add("active");
-}
-
-function hideFileViewer() {
-  document.getElementById("file-viewer-modal").classList.remove("active");
-}
-
-function toggleFilePanel() {
-  document.getElementById("file-panel").classList.toggle("active");
-}
-
-// --- Context Editor ---
-async function openContextEditor() {
-  if (!currentSlug || !currentProject) return;
-  const modal = document.getElementById("context-modal");
-  document.getElementById("context-editor").value = currentProject.context || "";
-  modal.classList.add("active");
-}
-
-async function saveContext() {
-  if (!currentSlug) return;
-  const content = document.getElementById("context-editor").value;
-  const btn = document.getElementById("save-context");
-  btn.disabled = true; btn.textContent = "Salvando...";
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${currentSlug}/context`, {
-      method: "PUT",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ content }),
-    });
-    if (res.ok) {
-      document.getElementById("context-modal").classList.remove("active");
-      if (currentProject) currentProject.context = content;
-    } else {
-      const err = await res.json().catch(() => ({}));
-      alert(err.detail || "Erro ao salvar");
-    }
-  } catch (e) { alert("Erro: " + e.message); }
-  finally { btn.disabled = false; btn.textContent = "Salvar"; }
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${path}`,{headers:hdr()});if(!r.ok)return;
+    const t=await r.text();
+    document.getElementById("fileViewerName").textContent=path;
+    const ed=document.getElementById("fileViewerContent"); ed.value=t;
+    const editable=['.md','.txt','.css','.js','.json','.html','.py','.ts'];
+    ed.readOnly=!editable.some(e=>path.endsWith(e));
+    const sb=document.getElementById("fileSaveBtn"); sb.style.display=ed.readOnly?"none":""; sb.dataset.path=path;
+    document.getElementById("fileModal").classList.add("active");
+  }catch{}
 }
 
 async function saveFile() {
-  const path = document.getElementById("file-save-btn").dataset.path;
-  const content = document.getElementById("file-viewer-content").value;
-  if (!currentSlug || !path) return;
-  const btn = document.getElementById("file-save-btn");
-  btn.disabled = true; btn.textContent = "Salvando...";
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${path}`, {
-      method: "PUT",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ content }),
-    });
-    if (res.ok) {
-      hideFileViewer();
-      refreshFileList(currentSlug);
-      if (path.endsWith('.html')) refreshPreview(currentSlug);
-    } else {
-      const err = await res.json().catch(() => ({}));
-      alert(err.detail || "Erro ao salvar");
-    }
-  } catch (e) { alert("Erro: " + e.message); }
-  finally { btn.disabled = false; btn.textContent = "💾 Salvar"; }
+  const path=document.getElementById("fileSaveBtn").dataset.path, content=document.getElementById("fileViewerContent").value;
+  if(!currentSlug||!path)return;
+  const btn=document.getElementById("fileSaveBtn"); btn.disabled=true; btn.textContent="Salvando...";
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${path}`,{method:"PUT",headers:hdrJson(),body:JSON.stringify({content})});
+    if(r.ok){document.getElementById("fileModal").classList.remove("active");refreshFiles(currentSlug);if(path.endsWith('.html'))refreshPreview(currentSlug);}
+    else alert((await r.json().catch(()=>({}))).detail||"Erro");
+  }catch(e){alert(e.message);}
+  finally{btn.disabled=false;btn.textContent="Salvar";}
 }
 
-// --- Chat History ---
-async function loadProjectHistory(slug) {
-  const container = document.getElementById("messages");
-  container.innerHTML = "";
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${slug}/history?limit=50`, { headers: authHeaders() });
-    if (!res.ok) return;
-    const msgs = await res.json();
-    for (const m of msgs) {
-      const div = document.createElement("div");
-      div.className = `msg ${m.role === "user" ? "user" : "ai"}`;
-      if (m.role === "user") div.textContent = m.content;
-      else div.innerHTML = renderMd(m.content || "");
-      container.appendChild(div);
-    }
-    container.scrollTop = container.scrollHeight;
-  } catch {}
+// Context
+async function openContext() {
+  if(!currentSlug||!currentProject)return;
+  document.getElementById("contextEditor").value=currentProject.context||"";
+  document.getElementById("contextModal").classList.add("active");
 }
 
-// --- Streaming Chat ---
-async function sendMessage() {
-  const input = document.getElementById("input");
-  const message = input.value.trim();
-  if (!message || streaming || !currentSlug) return;
-  input.value = "";
-  input.style.height = "auto";
-  streaming = true;
-
-  const msgsEl = document.getElementById("messages");
-
-  // User bubble
-  const userDiv = document.createElement("div");
-  userDiv.className = "msg user";
-  userDiv.textContent = message;
-  msgsEl.appendChild(userDiv);
-
-  // AI bubble
-  const aiDiv = document.createElement("div");
-  aiDiv.className = "msg ai streaming";
-  aiDiv.innerHTML = '<span class="stream-content"></span><span class="thinking-dot"></span>';
-  msgsEl.appendChild(aiDiv);
-  msgsEl.scrollTop = msgsEl.scrollHeight;
-
-  const contentEl = aiDiv.querySelector(".stream-content");
-  let fullText = "";
-
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${currentSlug}/chat/stream`, {
-      method: "POST",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: "Erro desconhecido" }));
-      contentEl.textContent = `❌ ${err.detail}`;
-      aiDiv.classList.remove("streaming");
-      streaming = false;
-      return;
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const lines = buf.split("\n");
-      buf = lines.pop() || "";
-
-      for (const line of lines) {
-        if (!line.startsWith("data:")) continue;
-        const payload = line.slice(5).trim();
-        if (payload === "[DONE]") break;
-        try {
-          const data = JSON.parse(payload);
-          if (data.token) {
-            fullText += data.token;
-            contentEl.textContent = fullText;
-            msgsEl.scrollTop = msgsEl.scrollHeight;
-          }
-          if (data.done) break;
-        } catch {}
-      }
-    }
-  } catch (e) {
-    contentEl.textContent = `❌ ${e.message}`;
-  }
-
-  // Finish: render markdown
-  aiDiv.classList.remove("streaming");
-  const dot = aiDiv.querySelector(".thinking-dot");
-  if (dot) dot.remove();
-  contentEl.innerHTML = renderMd(fullText || "(sem resposta)");
-  msgsEl.scrollTop = msgsEl.scrollHeight;
-  streaming = false;
-
-  // Auto-refresh preview + file list after AI responds
-  setTimeout(() => {
-    refreshPreview(currentSlug);
-    refreshFileList(currentSlug);
-  }, 1500);
+async function saveContext() {
+  if(!currentSlug)return;
+  const content=document.getElementById("contextEditor").value;
+  const btn=document.getElementById("saveContext"); btn.disabled=true; btn.textContent="Salvando...";
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/context`,{method:"PUT",headers:hdrJson(),body:JSON.stringify({content})});
+    if(r.ok){document.getElementById("contextModal").classList.remove("active");if(currentProject)currentProject.context=content;}
+    else alert((await r.json().catch(()=>({}))).detail||"Erro");
+  }catch(e){alert(e.message);}
+  finally{btn.disabled=false;btn.textContent="Salvar";}
 }
 
-// --- Preview ---
+// Preview
 async function refreshPreview(slug) {
-  if (!slug) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/${slug}/artifact`, { headers: authHeaders() });
-    if (res.ok) {
-      const html = await res.text();
-      const frame = document.getElementById("preview-frame");
-      frame.srcdoc = html;
-      frame.style.display = "";
-      document.getElementById("no-preview").style.display = "none";
-      document.getElementById("preview-title").textContent = "artifact.html";
-    } else {
-      document.getElementById("preview-frame").style.display = "none";
-      document.getElementById("no-preview").style.display = "";
-    }
-  } catch {}
+  if(!slug)return;
+  try{
+    const r=await fetch(`${API_BASE}/api/projects/${slug}/artifact`,{headers:hdr()});
+    if(r.ok){document.getElementById("previewFrame").srcdoc=await r.text();document.getElementById("previewFrame").style.display="";document.getElementById("noPreview").style.display="none";document.getElementById("previewTitle").textContent="artifact.html";}
+    else{document.getElementById("previewFrame").style.display="none";document.getElementById("noPreview").style.display="";}
+  }catch{}
 }
 
-// --- Helpers ---
-function escHtml(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
-function escAttr(s) { return s.replace(/'/g, "\\'").replace(/"/g, "&quot;"); }
+// Events
+document.getElementById("newProjectBtn")?.addEventListener("click",showCreate);
+document.getElementById("cancelCreate")?.addEventListener("click",hideCreate);
+document.getElementById("confirmCreate")?.addEventListener("click",doCreate);
+document.getElementById("projectName")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();doCreate();}});
+document.getElementById("backBtn")?.addEventListener("click",closeProject);
+document.getElementById("filesBtn")?.addEventListener("click",()=>document.getElementById("fileDrawer").classList.toggle("open"));
+document.getElementById("closeFiles")?.addEventListener("click",()=>document.getElementById("fileDrawer").classList.remove("open"));
+document.getElementById("contextBtn")?.addEventListener("click",openContext);
+document.getElementById("cancelContext")?.addEventListener("click",()=>document.getElementById("contextModal").classList.remove("active"));
+document.getElementById("saveContext")?.addEventListener("click",saveContext);
+document.getElementById("closeFileViewer")?.addEventListener("click",()=>document.getElementById("fileModal").classList.remove("active"));
+document.getElementById("fileSaveBtn")?.addEventListener("click",saveFile);
+document.getElementById("refreshPreview")?.addEventListener("click",()=>refreshPreview(currentSlug));
+document.getElementById("wsSend")?.addEventListener("click",sendMsg);
+document.getElementById("wsInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg();}});
+document.getElementById("wsInput")?.addEventListener("input",function(){this.style.height="auto";this.style.height=Math.min(this.scrollHeight,120)+"px";});
+window.addEventListener("popstate",e=>{if(e.state?.slug)openProject(e.state.slug);else closeProject();});
 
-// --- Event Listeners ---
-document.getElementById("logout-btn").addEventListener("click", logout);
-document.getElementById("back-btn").addEventListener("click", closeProject);
-document.getElementById("cancel-create").addEventListener("click", hideCreateModal);
-document.getElementById("confirm-create").addEventListener("click", createProject);
-document.getElementById("refresh-preview").addEventListener("click", () => refreshPreview(currentSlug));
-document.getElementById("send-btn").addEventListener("click", sendMessage);
-document.getElementById("input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-});
-document.getElementById("input").addEventListener("input", function() {
-  this.style.height = "auto";
-  this.style.height = Math.min(this.scrollHeight, 120) + "px";
-});
-document.getElementById("project-name").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") { e.preventDefault(); createProject(); }
-});
-
-// File panel toggle
-document.getElementById("files-toggle")?.addEventListener("click", toggleFilePanel);
-document.getElementById("close-files")?.addEventListener("click", () => {
-  document.getElementById("file-panel").classList.remove("active");
-});
-
-// Context editor
-document.getElementById("context-btn")?.addEventListener("click", openContextEditor);
-document.getElementById("cancel-context")?.addEventListener("click", () => {
-  document.getElementById("context-modal").classList.remove("active");
-});
-document.getElementById("save-context")?.addEventListener("click", saveContext);
-
-// File viewer
-document.getElementById("close-file-viewer")?.addEventListener("click", hideFileViewer);
-document.getElementById("file-save-btn")?.addEventListener("click", saveFile);
-
-// --- Init ---
-if (!loadAuth()) {
-  window.location.href = "/chat";
-} else {
-  const params = new URLSearchParams(location.search);
-  const projectSlug = params.get("project");
-  if (projectSlug) openProject(projectSlug);
+// Init
+if(!loadAuth()){location.href="/chat";}
+else{
+  initSidebar();
+  const p=new URLSearchParams(location.search).get("project");
+  if(p){loadProjects().then(()=>openProject(p));}
   else loadProjects();
 }
-
-window.addEventListener("popstate", (e) => {
-  if (e.state?.slug) openProject(e.state.slug);
-  else closeProject();
-});

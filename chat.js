@@ -7,7 +7,7 @@ const el = {
   loginBtn: document.getElementById("loginBtn"),
   loginStatus: document.getElementById("loginStatus"),
   logoutBtn: document.getElementById("logoutBtn"),
-  badge: document.getElementById("badge"),
+  // badge removed — now in sidebar
   title: document.getElementById("title"),
   health: document.getElementById("health"),
   messages: document.getElementById("messages"),
@@ -360,6 +360,7 @@ function renderHistory(items) {
 async function openChat() {
   el.loginView.style.display = "none";
   el.chatView.style.display = "flex";
+  document.getElementById("sidebar")?.style.setProperty("display", "flex");
   el.title.textContent = mimuuName || "Mimuu";
   el.health.textContent = "sincronizando…";
   el.health.className = "topbar-status";
@@ -370,6 +371,10 @@ async function openChat() {
   el.health.textContent = "online";
   el.health.className = "topbar-status online";
   el.input.focus();
+
+  // Load sidebar data
+  updateSidebarUser();
+  loadSidebarProjects();
 }
 
 // --- Forgot password ---
@@ -708,6 +713,7 @@ async function boot() {
   }
 
   el.loginView.style.display = "flex";
+  document.getElementById("sidebar")?.style.setProperty("display", "none");
 }
 
 // --- Events ---
@@ -744,5 +750,71 @@ el.input.addEventListener("input", () => {
   el.input.style.height = "auto";
   el.input.style.height = Math.min(el.input.scrollHeight, 160) + "px";
 });
+
+// --- Sidebar ---
+const sidebar = document.getElementById("sidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+function openSidebar() {
+  sidebar?.classList.add("open");
+  sidebarOverlay?.classList.add("active");
+}
+function closeSidebar() {
+  sidebar?.classList.remove("open");
+  sidebarOverlay?.classList.remove("active");
+}
+
+document.getElementById("menuBtn")?.addEventListener("click", openSidebar);
+document.getElementById("sidebarClose")?.addEventListener("click", closeSidebar);
+sidebarOverlay?.addEventListener("click", closeSidebar);
+
+// New chat from sidebar
+document.getElementById("newChatNav")?.addEventListener("click", () => {
+  el.messages.innerHTML = "";
+  addMsg("Nova conversa", "system");
+  el.input.focus();
+  closeSidebar();
+});
+
+async function loadSidebarProjects() {
+  if (!token) return;
+  const container = document.getElementById("sidebarProjects");
+  if (!container) return;
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/projects`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+    const projects = await res.json();
+    
+    if (!projects.length) {
+      container.innerHTML = `<a href="/projects" class="project-item" style="color:#6b6860">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Criar projeto
+      </a>`;
+      return;
+    }
+    
+    let html = '';
+    for (const p of projects.slice(0, 8)) {
+      html += `<a href="/projects?project=${p.slug}" class="project-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.name)}</span>
+      </a>`;
+    }
+    if (projects.length > 8) {
+      html += `<a href="/projects" class="project-item" style="color:#6b6860">Ver todos (${projects.length})</a>`;
+    }
+    container.innerHTML = html;
+  } catch {}
+}
+
+function updateSidebarUser() {
+  const avatar = document.getElementById("userAvatar");
+  const name = document.getElementById("userName");
+  if (avatar && ownerName) avatar.textContent = ownerName.charAt(0).toUpperCase();
+  if (name) name.textContent = ownerName || "Usuário";
+}
 
 boot();
