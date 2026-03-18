@@ -178,7 +178,7 @@ class ThinkingIndicator {
     this.el = document.createElement("div");
     this.el.className = "msg ai thinking-bubble";
     this.el.innerHTML = `
-      <span class="thinking-ball"></span>
+      <span class="thinking-ball"><img src="/mimuu-avatar.png" alt=""></span>
       <span class="thinking-text"></span>
     `;
     this.textEl = this.el.querySelector(".thinking-text");

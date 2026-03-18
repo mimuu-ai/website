@@ -74,8 +74,12 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(145deg, var(--brand), var(--brand-deep));
-  box-shadow: 0 4px 16px rgba(255,143,0,.3);
+  overflow: hidden;
+}
+.logo-glyph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .login-card h1 {
@@ -190,9 +194,14 @@ body {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: linear-gradient(145deg, var(--brand), var(--brand-deep));
+  overflow: hidden;
   flex-shrink: 0;
   position: relative;
+}
+.avatar-dot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .avatar-dot::after {
@@ -471,13 +480,17 @@ body {
 }
 
 .thinking-ball {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, var(--brand), var(--brand-deep));
-  box-shadow: 0 2px 8px rgba(255,143,0,.3);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
   animation: bounce 1s ease infinite;
   flex-shrink: 0;
+}
+.thinking-ball img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 @keyframes bounce {
