@@ -177,7 +177,7 @@ async function refreshFiles(slug) {
 async function viewFile(path) {
   if(!currentSlug)return;
   if(path.endsWith('.html')){
-    try{const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${path}`,{headers:hdr()});if(r.ok){const h=await r.text();document.getElementById("previewFrame").srcdoc=injectBase(h);document.getElementById("previewFrame").style.display="";document.getElementById("noPreview").style.display="none";document.getElementById("previewTitle").textContent=path;}}catch{}
+    try{const r=await fetch(`${API_BASE}/api/projects/${currentSlug}/files/${path}`,{headers:hdr()});if(r.ok){const h=await r.text();document.getElementById("previewFrame").srcdoc=sandboxHtml(h);document.getElementById("previewFrame").style.display="";document.getElementById("noPreview").style.display="none";document.getElementById("previewTitle").textContent=path;}}catch{}
     return;
   }
   try{
@@ -224,18 +224,37 @@ async function saveContext() {
 }
 
 // Preview
-function injectBase(html) {
-  // Inject <base target="_blank"> so links open in new tab, not parent
-  if(html.includes('<head>')) return html.replace('<head>','<head><base target="_blank">');
-  if(html.includes('<html')) return html.replace(/(<html[^>]*>)/i,'$1<head><base target="_blank"></head>');
-  return '<base target="_blank">' + html;
+function sandboxHtml(html) {
+  // Inject script that intercepts ALL link clicks and prevents navigation
+  // Also intercepts form submits. Everything stays inside the preview.
+  const script = `<script>
+document.addEventListener('click', function(e) {
+  var a = e.target.closest('a');
+  if (a) {
+    e.preventDefault();
+    e.stopPropagation();
+    // If it's an anchor link (#section), scroll to it
+    var href = a.getAttribute('href') || '';
+    if (href.startsWith('#')) {
+      var target = document.querySelector(href);
+      if (target) target.scrollIntoView({behavior:'smooth'});
+    }
+    // Otherwise do nothing — no external navigation
+  }
+}, true);
+document.addEventListener('submit', function(e) { e.preventDefault(); }, true);
+<\/script>`;
+  
+  if (html.includes('</body>')) return html.replace('</body>', script + '</body>');
+  if (html.includes('</html>')) return html.replace('</html>', script + '</html>');
+  return html + script;
 }
 
 async function refreshPreview(slug) {
   if(!slug)return;
   try{
     const r=await fetch(`${API_BASE}/api/projects/${slug}/artifact`,{headers:hdr()});
-    if(r.ok){const html=await r.text();document.getElementById("previewFrame").srcdoc=injectBase(html);document.getElementById("previewFrame").style.display="";document.getElementById("noPreview").style.display="none";document.getElementById("previewTitle").textContent="artifact.html";}
+    if(r.ok){const html=await r.text();document.getElementById("previewFrame").srcdoc=sandboxHtml(html);document.getElementById("previewFrame").style.display="";document.getElementById("noPreview").style.display="none";document.getElementById("previewTitle").textContent="artifact.html";}
     else{document.getElementById("previewFrame").style.display="none";document.getElementById("noPreview").style.display="";}
   }catch{}
 }
