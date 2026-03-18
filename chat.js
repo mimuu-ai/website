@@ -709,6 +709,7 @@ async function boot() {
 
   if (restore()) {
     await openChat();
+    checkGoogleStatus();
     return;
   }
 
@@ -828,6 +829,28 @@ function updateSidebarUser() {
   const name = document.getElementById("userName");
   if (avatar && ownerName) avatar.textContent = ownerName.charAt(0).toUpperCase();
   if (name) name.textContent = ownerName || "Usuário";
+}
+
+// Google Workspace connection
+async function connectGoogle() {
+  const btn = document.getElementById("googleConnectBtn");
+  const txt = document.getElementById("googleBtnText");
+  if (txt.textContent.includes("✅")) return; // already connected
+  window.open(API_BASE + "/api/auth/google/connect?token=" + encodeURIComponent(authToken), "_blank");
+}
+
+async function checkGoogleStatus() {
+  try {
+    const r = await fetch(API_BASE + "/api/auth/google/status", { headers: {"Authorization": "Bearer " + authToken} });
+    if (r.ok) {
+      const data = await r.json();
+      const txt = document.getElementById("googleBtnText");
+      if (data.connected && txt) {
+        txt.textContent = "✅ Google conectado";
+        document.getElementById("googleConnectBtn").style.color = "#4ade80";
+      }
+    }
+  } catch {}
 }
 
 boot();
