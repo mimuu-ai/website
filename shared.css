@@ -356,6 +356,42 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 .status-ok { color: var(--ok); }
 .status-err { color: var(--danger); }
 
+.topbar-status {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+.topbar-status.online {
+  color: var(--ok);
+  background: rgba(22,163,74,0.08);
+}
+.topbar-status.error {
+  color: var(--danger);
+  background: rgba(220,38,38,0.08);
+}
+
+/* Recording pulse */
+.recording {
+  animation: rec-pulse 1s infinite;
+  color: var(--danger) !important;
+}
+@keyframes rec-pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+/* Thinking ball */
+.thinking-ball {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff8f00, #ffc928);
+  box-shadow: 0 0 8px rgba(255,143,0,0.4);
+  animation: bounce-ball 0.8s ease-in-out infinite alternate;
+  display: inline-block;
+  flex-shrink: 0;
+}
+@keyframes bounce-ball { 0% { transform: translateY(0); } 100% { transform: translateY(-6px); } }
+
 /* ─── TTS Button ─── */
 .tts-btn {
   position: absolute;
