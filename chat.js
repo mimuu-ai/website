@@ -764,7 +764,13 @@ function closeSidebar() {
   sidebarOverlay?.classList.remove("active");
 }
 
-document.getElementById("menuBtn")?.addEventListener("click", openSidebar);
+document.getElementById("menuBtn")?.addEventListener("click", () => {
+  if (window.innerWidth <= 768) {
+    openSidebar();
+  } else {
+    sidebar?.classList.remove("collapsed");
+  }
+});
 document.getElementById("sidebarClose")?.addEventListener("click", () => {
   // On mobile: close overlay. On desktop: collapse sidebar.
   if (window.innerWidth <= 768) {
