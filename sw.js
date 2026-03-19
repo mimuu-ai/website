@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mimuu-v1';
+const CACHE_NAME = 'mimuu-v2';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_URLS = [
@@ -7,6 +7,7 @@ const PRECACHE_URLS = [
   '/chat.js',
   '/favicon-192.png',
   '/favicon-512.png',
+  '/mimuu-avatar.png',
   '/offline.html',
   'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap',
   'https://cdn.jsdelivr.net/npm/marked@15/marked.min.js'
