@@ -854,3 +854,12 @@ async function checkGoogleStatus() {
 }
 
 boot();
+
+// ═══ SERVICE WORKER (PWA) ═══
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('[PWA] Service worker registered, scope:', reg.scope);
+  }).catch(err => {
+    console.warn('[PWA] SW registration failed:', err);
+  });
+}
