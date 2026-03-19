@@ -855,6 +855,29 @@ async function checkGoogleStatus() {
 
 boot();
 
+// ═══ MOBILE KEYBOARD VIEWPORT FIX ═══
+(function() {
+  function setVh() {
+    const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) / 100;
+    document.documentElement.style.setProperty('--vh', vh + 'px');
+  }
+  setVh();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setVh);
+  } else {
+    window.addEventListener('resize', setVh);
+  }
+  // Also scroll messages to bottom when keyboard opens
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const msgs = document.getElementById('messages');
+      if (msgs) {
+        requestAnimationFrame(() => msgs.scrollTop = msgs.scrollHeight);
+      }
+    });
+  }
+})();
+
 // ═══ SERVICE WORKER (PWA) ═══
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(reg => {

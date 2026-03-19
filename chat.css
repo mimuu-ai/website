@@ -167,6 +167,7 @@ body {
   flex-direction: column;
   height: 100vh;
   height: 100dvh;
+  height: calc(var(--vh, 1dvh) * 100);
 }
 
 /* ═══ TOP BAR ═══ */
