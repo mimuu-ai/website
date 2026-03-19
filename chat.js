@@ -857,22 +857,54 @@ boot();
 
 // ═══ MOBILE KEYBOARD VIEWPORT FIX ═══
 (function() {
-  function setVh() {
-    const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) / 100;
-    document.documentElement.style.setProperty('--vh', vh + 'px');
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  function adjustForKeyboard() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const chatView = document.querySelector('.chat-view');
+    if (!chatView) return;
+
+    // Set height to exactly the visual viewport
+    chatView.style.height = vv.height + 'px';
+
+    // On iOS PWA, the viewport can shift — compensate with offsetTop
+    if (isIOS) {
+      chatView.style.position = 'fixed';
+      chatView.style.top = vv.offsetTop + 'px';
+      chatView.style.left = '0';
+      chatView.style.right = '0';
+    }
+
+    // Scroll messages to bottom
+    const msgs = document.getElementById('messages');
+    if (msgs) {
+      requestAnimationFrame(() => msgs.scrollTop = msgs.scrollHeight);
+    }
   }
-  setVh();
+
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', setVh);
-  } else {
-    window.addEventListener('resize', setVh);
+    window.visualViewport.addEventListener('resize', adjustForKeyboard);
+    window.visualViewport.addEventListener('scroll', adjustForKeyboard);
   }
-  // Also scroll messages to bottom when keyboard opens
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
-      const msgs = document.getElementById('messages');
-      if (msgs) {
-        requestAnimationFrame(() => msgs.scrollTop = msgs.scrollHeight);
+
+  // Also handle focus on input
+  const textarea = document.getElementById('input');
+  if (textarea && isIOS) {
+    textarea.addEventListener('focus', () => {
+      setTimeout(adjustForKeyboard, 300);
+      setTimeout(adjustForKeyboard, 600);
+    });
+    textarea.addEventListener('blur', () => {
+      const chatView = document.querySelector('.chat-view');
+      if (chatView) {
+        chatView.style.height = '';
+        chatView.style.position = '';
+        chatView.style.top = '';
       }
     });
   }

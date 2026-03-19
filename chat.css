@@ -651,6 +651,14 @@ body {
 
 /* ═══ MOBILE ═══ */
 @media (max-width: 640px) {
+  .chat-view {
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
   .messages { padding: 16px 14px 8px; gap: 20px; }
   .msg { font-size: 15px; }
   .msg.user > .msg-content { max-width: 90%; }
