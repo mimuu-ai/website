@@ -447,11 +447,13 @@
         </div>
       </div>
 
-      <!-- Email -->
+      <!-- Email e Senha -->
       <div class="section">
-        <div class="section-label">Seu email</div>
-        <div class="section-hint">Vamos enviar o link do seu Mimuu por aqui.</div>
-        <input type="email" id="email" placeholder="seu@email.com" required />
+        <div class="section-label">Sua conta</div>
+        <div class="section-hint">Email e senha para acessar seu Mimuu pelo chat.</div>
+        <input type="email" id="email" placeholder="seu@email.com *" required />
+        <div style="height: 12px"></div>
+        <input type="password" id="password" placeholder="Crie uma senha (min. 6 caracteres) *" required minlength="6" />
       </div>
 
       <!-- Nome do Mimuu -->
@@ -479,9 +481,9 @@
     <div class="check">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <h2>Seu Mimuu esta pronto!</h2>
-    <p>Toque no botao abaixo para abrir o Telegram e comecar a conversar com o <span class="bot-name" id="botDisplayName">seu Mimuu</span>.</p>
-    <a href="#" class="bot-link" id="botLink" target="_blank">Abrir no Telegram</a>
+    <h2>Seu <span id="botDisplayName">Mimuu</span> esta pronto!</h2>
+    <p>Redirecionando para o chat...</p>
+    <a href="#" class="bot-link" id="chatLink">Abrir Chat</a>
   </div>
 
   <!-- Toast -->
@@ -534,9 +536,11 @@
 
       const nome = document.getElementById('nome').value.trim();
       const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
       if (!nome) { showToast('Preencha seu nome'); return; }
       if (!email || !email.includes('@')) { showToast('Preencha um email valido'); return; }
+      if (!password || password.length < 6) { showToast('Senha deve ter pelo menos 6 caracteres'); return; }
 
       const personalidade = document.querySelector('input[name="personalidade"]:checked');
       if (!personalidade) { showToast('Escolha uma personalidade pro seu Mimuu'); return; }
@@ -545,12 +549,13 @@
 
       const payload = {
         nome: nome,
+        email: email,
+        password: password,
         apelido: document.getElementById('apelido').value.trim() || nome,
         pronomes: document.getElementById('pronomes').value,
         timezone: document.getElementById('timezone').value,
         personalidade: personalidade.value,
         interesses: interesses,
-        email: email,
         nome_mimuu: document.getElementById('nomeMimuu').value.trim() || '',
         observacoes: document.getElementById('observacoes').value.trim()
       };
@@ -573,16 +578,31 @@
 
         const data = await res.json();
 
-        // Show success
+        // Save token for webchat auto-login
+        if (data.token) {
+          localStorage.setItem('mimuu_chat', JSON.stringify({
+            token: data.token,
+            mimuuName: data.mimuu_name || 'Mimuu',
+            ownerName: nome,
+          }));
+        }
+
+        // Show success briefly, then redirect to webchat
         document.getElementById('formWrap').style.display = 'none';
         document.querySelector('.header').style.display = 'none';
         const success = document.getElementById('successScreen');
         success.classList.add('show');
 
-        document.getElementById('botDisplayName').textContent = data.bot_name || 'seu Mimuu';
-        document.getElementById('botLink').href = data.bot_url || '#';
+        document.getElementById('botDisplayName').textContent = data.mimuu_name || 'Mimuu';
+        const chatUrl = data.chat_url || '/chat';
+        document.getElementById('chatLink').href = chatUrl;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Auto-redirect to webchat after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/chat';
+        }, 2000);
 
       } catch (err) {
         console.error('Submit error:', err);
