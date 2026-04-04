@@ -641,42 +641,105 @@ body {
   margin-left: 6px;
 }
 
-.model-selector {
-  display: flex;
-  gap: 4px;
+.model-picker {
+  position: relative;
   margin-left: auto;
 }
 
-.model-btn {
-  background: none;
-  border: 1px solid var(--border-light);
-  border-radius: 6px;
-  padding: 3px 10px;
-  font-size: 11px;
-  font-family: 'DM Sans', sans-serif;
+.model-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
   color: var(--text-tertiary);
+  font-family: var(--font);
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all .15s var(--ease);
   white-space: nowrap;
 }
 
-.model-btn:hover {
-  border-color: var(--text-secondary);
+.model-trigger:hover {
+  border-color: var(--brand);
   color: var(--text-secondary);
 }
 
-.model-btn.selected {
-  background: #fff9ea;
-  border-color: #ff8f00;
-  color: #ff8f00;
-  font-weight: 500;
+.model-trigger.open {
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
-@media (max-width: 600px) {
-  .model-btn {
-    padding: 3px 7px;
-    font-size: 10px;
-  }
+.model-dropdown {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: 4px;
+  z-index: 100;
+}
+
+.model-dropdown.open {
+  display: block;
+}
+
+.model-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s var(--ease);
+}
+
+.model-option:hover {
+  background: var(--surface-hover);
+}
+
+.model-option.selected {
+  background: var(--bg);
+  color: var(--brand);
+}
+
+.model-option.selected svg {
+  stroke: var(--brand);
+}
+
+.model-option svg {
+  flex-shrink: 0;
+  stroke: var(--text-tertiary);
+}
+
+.model-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.model-option-name {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.model-option-desc {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
 }
 
 .composer-hint {

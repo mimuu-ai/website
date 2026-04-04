@@ -70,12 +70,31 @@ const MODEL_MAP = {
 };
 
 function initModelSelector() {
-  const btns = document.querySelectorAll(".model-btn");
-  btns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      btns.forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedModel = btn.dataset.model;
+  const trigger = document.getElementById("modelTrigger");
+  const dropdown = document.getElementById("modelDropdown");
+  const label = document.getElementById("modelLabel");
+  if (!trigger || !dropdown) return;
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle("open");
+    trigger.classList.toggle("open", isOpen);
+  });
+
+  document.addEventListener("click", () => {
+    dropdown.classList.remove("open");
+    trigger.classList.remove("open");
+  });
+
+  dropdown.querySelectorAll(".model-option").forEach(opt => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdown.querySelectorAll(".model-option").forEach(o => o.classList.remove("selected"));
+      opt.classList.add("selected");
+      selectedModel = opt.dataset.model;
+      label.textContent = opt.querySelector(".model-option-name").textContent;
+      dropdown.classList.remove("open");
+      trigger.classList.remove("open");
     });
   });
 }
