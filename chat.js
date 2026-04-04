@@ -98,20 +98,56 @@ function updateAttachmentBadge() {
   el.attachCount.textContent = `${pendingAttachments.length} anexo(s): ${names}${more}`;
 }
 
-function fileToAttachment(file) {
+function compressImage(file, maxDim = 1024, quality = 0.7) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result || "");
-      const base64 = result.includes(",") ? result.split(",", 2)[1] : "";
-      resolve({
-        name: file.name,
-        mime: file.type || "application/octet-stream",
-        data_base64: base64,
-      });
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        const scale = maxDim / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL("image/jpeg", quality);
+      const base64 = dataUrl.split(",", 2)[1] || "";
+      resolve({ base64, mime: "image/jpeg" });
     };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function fileToAttachment(file) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Compress images before converting to base64
+      if (file.type && file.type.startsWith("image/") && file.size > 100 * 1024) {
+        const compressed = await compressImage(file);
+        resolve({
+          name: file.name,
+          mime: compressed.mime,
+          data_base64: compressed.base64,
+        });
+        return;
+      }
+      // Non-image files: read as-is
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result || "");
+        const base64 = result.includes(",") ? result.split(",", 2)[1] : "";
+        resolve({
+          name: file.name,
+          mime: file.type || "application/octet-stream",
+          data_base64: base64,
+        });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    } catch (e) { reject(e); }
   });
 }
 
