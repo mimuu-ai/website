@@ -61,6 +61,25 @@ function restore() {
   } catch { return false; }
 }
 
+// --- Model selector ---
+let selectedModel = "default";
+const MODEL_MAP = {
+  fast: "azure-openai/gpt-5-nano",
+  default: "azure-openai/gpt-5-mini",
+  complex: "azure-openai/gpt-5",
+};
+
+function initModelSelector() {
+  const btns = document.querySelectorAll(".model-btn");
+  btns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      btns.forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedModel = btn.dataset.model;
+    });
+  });
+}
+
 function logout() {
   token = "";
   mimuuName = "";
@@ -642,7 +661,7 @@ async function sendMessage() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ message, attachments: attachmentsToSend }),
+      body: JSON.stringify({ message, attachments: attachmentsToSend, model: MODEL_MAP[selectedModel] || "default" }),
     });
 
     if (!res.ok) {
@@ -742,6 +761,8 @@ async function boot() {
     await openChat();
     return;
   }
+
+  initModelSelector();
 
   if (restore()) {
     await openChat();

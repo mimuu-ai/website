@@ -641,6 +641,44 @@ body {
   margin-left: 6px;
 }
 
+.model-selector {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.model-btn {
+  background: none;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.model-btn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.model-btn.selected {
+  background: #fff9ea;
+  border-color: #ff8f00;
+  color: #ff8f00;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .model-btn {
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+}
+
 .composer-hint {
   text-align: center;
   font-size: 12px;
