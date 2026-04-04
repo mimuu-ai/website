@@ -547,7 +547,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  overflow: hidden;
+  overflow: visible;
   transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
 }
 
